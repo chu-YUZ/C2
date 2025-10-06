@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 云成绩</title>
+    <script src="assets/js/data-sync.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #0d47a1 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+            animation: backgroundFloat 10s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+        }
+        
+        .register-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15),
+                        0 0 0 1px rgba(255, 255, 255, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            overflow: visible;
+            animation: containerEntry 1s ease-out;
+            margin: 20px 0;
+        }
+        
+        .register-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(66, 133, 244, 0.03), transparent);
+            animation: containerGlow 30s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes containerEntry {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes containerGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .register-container h2 {
+            color: #1976d2;
+            margin-bottom: 35px;
+            font-size: 32px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(45deg, #1976d2, #4285f4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+        
+        .register-container h2::before {
+            content: '📝';
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            animation: noteFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+        
+        @keyframes noteFloat {
+            0%, 100% { transform: translateY(-50%) rotate(0deg); }
+            50% { transform: translateY(-60%) rotate(10deg); }
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .form-group label::before {
+            content: '🔹';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+        
+        .form-group.required label::before {
+            content: '🔸';
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 14px 14px 40px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .form-group input:hover,
+        .form-group select:hover {
+            border-color: #2196f3;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 为不同输入框添加图标 */
+        .form-group:nth-child(1) input { /* 用户名 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232196f3' viewBox='0 0 16 16'%3E%3Cpath d='M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+        
+        .form-group:nth-child(2) input { /* 密码 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232196f3' viewBox='0 0 16 16'%3E%3Cpath d='M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+        
+        .form-group:nth-child(3) input { /* 姓名 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232196f3' viewBox='0 0 16 16'%3E%3Cpath d='M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+        
+        .form-group:nth-child(4) input { /* 考号 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232196f3' viewBox='0 0 16 16'%3E%3Cpath d='M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.758 2.855L15 11.114v-5.73zm-.034 6.878L9.271 8.82 8 9.583 6.728 8.82l-5.694 3.44A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.739zM1 11.114l4.758-2.876L1 5.383v5.73z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+        
+        .form-group:nth-child(5) input { /* 学校 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232196f3' viewBox='0 0 16 16'%3E%3Cpath d='M7 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm8 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm6 6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm10-2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm12 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+        
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232196f3' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            appearance: none;
+        }
+        
+        .grades-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .grades-section h3 {
+            color: #1976d2;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .grade-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            align-items: end;
+        }
+        
+        .grade-item > div {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .remove-grade-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            height: fit-content;
+            align-self: end;
+        }
+        
+        .remove-grade-btn:hover {
+            background: #c82333;
+        }
+        
+        .add-grade-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 15px auto;
+        }
+        
+        .add-grade-btn:hover {
+            background: #218838;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, #28a745, #218838);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 15px auto;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* 邀请码信息样式 */
+        .invite-code-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .invite-code-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .invite-code-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .remaining-uses-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2 id="pageTitle">用户注册</h2>
+        
+        <!-- 邀请码信息显示 -->
+        <div id="inviteCodeInfo" class="invite-code-info" style="display: none;">
+            <h3>邀请码信息</h3>
+            <p>邀请码卡号：<span id="inviteCodeNumber"></span></p>
+            <p>有效时间：<span id="inviteCodeValidDays"></span></p>
+            <p>剩余次数：<span id="inviteCodeRemainingUses"></span></p>
+        </div>
+        
+        <!-- 剩余次数警告 -->
+        <div id="remainingUsesWarning" class="remaining-uses-warning" style="display: none;">
+            此页面的用户创建成功后若还想创建用户，请再次使用您当前的邀请码验证，以完成创建用户的操作，故当创建用户的次数用完后就不能创建用户了，并且要和验证邀请码的网页交互
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <form id="registerForm">
+            <div class="form-grid">
+                <div class="form-group required">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group required">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <div class="form-group required">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group required">
+                    <label for="examNumber">考号</label>
+                    <input type="text" id="examNumber" name="examNumber" required>
+                </div>
+                
+                <div class="form-group required full-width">
+                    <label for="school">学校</label>
+                    <input type="text" id="school" name="school" required>
+                </div>
+            </div>
+            
+            <div class="grades-section">
+                <h3>成绩信息</h3>
+                
+                <div class="form-group required">
+                    <label for="examName">考试名称</label>
+                    <input type="text" id="examName" name="examName" placeholder="如：2024年期中考试" required>
+                </div>
+                
+                <div id="gradesContainer">
+                    <div class="grade-item">
+                        <div>
+                            <label>科目</label>
+                            <input type="text" name="subject[]" placeholder="如：数学" required>
+                        </div>
+                        <div>
+                            <label>成绩</label>
+                            <input type="number" name="score[]" placeholder="分数" min="0" max="150" required>
+                        </div>
+                        <button type="button" class="remove-grade-btn" onclick="removeGradeItem(this)">删除</button>
+                    </div>
+                </div>
+                
+                <button type="button" class="add-grade-btn" onclick="addGradeItem()">+ 添加科目</button>
+            </div>
+            
+            <button type="submit" class="submit-btn">注册</button>
+        </form>
+        
+        <button type="button" class="back-btn" onclick="goBack()">返回</button>
+    </div>
+
+    <script>
+        let isEditMode = false;
+        let currentUser = '';
+        let fromInvite = false;
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            isEditMode = urlParams.get('edit') === 'true';
+            fromInvite = urlParams.get('from') === 'invite';
+            
+            if (isEditMode) {
+                currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                document.getElementById('pageTitle').textContent = '编辑个人信息';
+                loadUserData();
+            } else if (fromInvite) {
+                // 来自邀请码验证，显示欢迎消息
+                document.getElementById('pageTitle').textContent = '完成注册';
+                showMessage('邀请码验证成功！请完成注册信息。', 'success');
+            }
+            
+            // 注册数据同步回调
+            if (typeof dataSync !== 'undefined') {
+                dataSync.registerCallback('register', function(data) {
+                    console.log('接收到数据同步通知');
+                    // 在编辑模式下检查用户数据变化
+                    if (isEditMode && currentUser) {
+                        const userInfo = data.users[currentUser];
+                        if (userInfo) {
+                            // 检查用户是否被封禁
+                            if (data.bannedUsers[currentUser]) {
+                                showMessage('您的账户已被管理员封禁，即将跳转到首页。', 'error');
+                                setTimeout(() => {
+                                    window.location.href = 'index.html';
+                                }, 3000);
+                            }
+                        } else {
+                            // 用户被删除
+                            showMessage('您的账户已被管理员删除，即将跳转到首页。', 'error');
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 3000);
+                        }
+                    }
+                });
+            }
+            
+            // 检查邀请码信息
+            checkInviteCodeInfo();
+        };
+        
+        // 检查邀请码信息
+        function checkInviteCodeInfo() {
+            // 检查URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const inviteCode = urlParams.get('invite');
+            
+            if (inviteCode) {
+                // 显示邀请码信息
+                showInviteCodeInfo(inviteCode);
+            } else {
+                // 检查本地存储中的邀请码
+                const currentInviteCode = localStorage.getItem('currentInviteCode');
+                if (currentInviteCode) {
+                    showInviteCodeInfo(currentInviteCode);
+                }
+            }
+        }
+        
+        // 显示邀请码信息
+        function showInviteCodeInfo(code) {
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            const inviteCodeInfo = inviteCodes[code];
+            
+            if (inviteCodeInfo) {
+                document.getElementById('inviteCodeNumber').textContent = code;
+                
+                if (inviteCodeInfo.validDays === -1) {
+                    document.getElementById('inviteCodeValidDays').textContent = '永久有效';
+                } else {
+                    document.getElementById('inviteCodeValidDays').textContent = `${inviteCodeInfo.validDays}天`;
+                }
+                
+                const remainingUses = (inviteCodeInfo.maxUses || 1) - (inviteCodeInfo.usedCount || 0);
+                document.getElementById('inviteCodeRemainingUses').textContent = `${remainingUses}次`;
+                
+                document.getElementById('inviteCodeInfo').style.display = 'block';
+                
+                // 如果剩余次数小于等于2，显示警告
+                if (remainingUses <= 2) {
+                    document.getElementById('remainingUsesWarning').style.display = 'block';
+                }
+            }
+        }
+        
+        // 加载用户数据（编辑模式）
+        function loadUserData() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const userInfo = users[currentUser];
+            
+            if (userInfo) {
+                document.getElementById('username').value = currentUser;
+                document.getElementById('username').disabled = true;
+                document.getElementById('password').value = userInfo.password;
+                document.getElementById('name').value = userInfo.name || '';
+                document.getElementById('examNumber').value = userInfo.examNumber || '';
+                document.getElementById('school').value = userInfo.school || '';
+                
+                // 加载成绩信息
+                if (userInfo.grades && userInfo.grades.length > 0) {
+                    const container = document.getElementById('gradesContainer');
+                    container.innerHTML = '';
+                    
+                    userInfo.grades.forEach((grade, index) => {
+                        const gradeItem = createGradeItem();
+                        const inputs = gradeItem.querySelectorAll('input');
+                        inputs[0].value = grade.subject;
+                        inputs[1].value = grade.score;
+                        container.appendChild(gradeItem);
+                    });
+                }
+                
+                // 加载考试名称
+                if (userInfo.grades && userInfo.grades.length > 0) {
+                    document.getElementById('examName').value = userInfo.grades[0].examName || '';
+                }
+            }
+        }
+        
+        // 添加成绩项
+        function addGradeItem() {
+            const container = document.getElementById('gradesContainer');
+            const gradeItem = createGradeItem();
+            container.appendChild(gradeItem);
+        }
+        
+        // 创建成绩项元素
+        function createGradeItem() {
+            const gradeItem = document.createElement('div');
+            gradeItem.className = 'grade-item';
+            gradeItem.innerHTML = `
+                <div>
+                    <label>科目</label>
+                    <input type="text" name="subject[]" placeholder="如：数学" required>
+                </div>
+                <div>
+                    <label>成绩</label>
+                    <input type="number" name="score[]" placeholder="分数" min="0" max="150" required>
+                </div>
+                <button type="button" class="remove-grade-btn" onclick="removeGradeItem(this)">删除</button>
+            `;
+            return gradeItem;
+        }
+        
+        // 删除成绩项
+        function removeGradeItem(btn) {
+            const container = document.getElementById('gradesContainer');
+            if (container.children.length > 1) {
+                btn.closest('.grade-item').remove();
+            } else {
+                showMessage('至少需要保留一条成绩记录！', 'error');
+            }
+        }
+        
+        // 处理表单提交
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const username = formData.get('username');
+            const password = formData.get('password');
+            const name = formData.get('name');
+            const examNumber = formData.get('examNumber');
+            const school = formData.get('school');
+            const examName = formData.get('examName');
+            
+            const subjects = formData.getAll('subject[]');
+            const scores = formData.getAll('score[]');
+            
+            // 验证数据
+            if (!username || !password || !name || !examNumber || !school || !examName) {
+                showMessage('请填写所有必填字段！', 'error');
+                return;
+            }
+            
+            if (subjects.length === 0 || scores.length === 0) {
+                showMessage('请至少添加一条成绩记录！', 'error');
+                return;
+            }
+            
+            // 构建成绩数组
+            const grades = [];
+            for (let i = 0; i < subjects.length; i++) {
+                if (subjects[i] && scores[i]) {
+                    grades.push({
+                        subject: subjects[i],
+                        score: parseFloat(scores[i]),
+                        examName: examName,
+                        date: new Date().toLocaleDateString()
+                    });
+                }
+            }
+            
+            // 保存用户信息
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (!isEditMode && users[username]) {
+                showMessage('用户名已存在！', 'error');
+                return;
+            }
+            
+            users[username] = {
+                password: password,
+                name: name,
+                examNumber: examNumber,
+                school: school,
+                grades: grades,
+                createdAt: users[username]?.createdAt || new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // 清除当前邀请码（注册成功后）
+            localStorage.removeItem('currentInviteCode');
+            
+            if (isEditMode) {
+                showMessage('个人信息更新成功！', 'success');
+                setTimeout(() => {
+                    window.location.href = 'user-home.html';
+                }, 1500);
+            } else {
+                showMessage('注册成功！', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }
+        });
+        
+        // 返回
+        function goBack() {
+            try {
+                if (isEditMode) {
+                    window.location.href = 'user-home.html';
+                } else if (fromInvite) {
+                    window.location.href = 'invite-code.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error('返回错误:', error);
+                // 备用返回方式
+                window.history.back();
+            }
+        }
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            if (type !== 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

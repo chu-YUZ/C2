@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开通会员 - 云成绩</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #0d47a1 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 18s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+            animation: backgroundFloat 12s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translateX(0px) rotate(0deg); }
+            50% { transform: translateX(20px) rotate(2deg); }
+        }
+        
+        .payment-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15),
+                        0 0 0 1px rgba(255, 255, 255, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: containerEntry 1s ease-out;
+        }
+        
+        .payment-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(66, 133, 244, 0.03), transparent);
+            animation: containerGlow 25s linear infinite;
+        }
+        
+        @keyframes containerEntry {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes containerGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .payment-container h2 {
+            color: #1976d2;
+            margin-bottom: 35px;
+            font-size: 32px;
+            position: relative;
+            background: linear-gradient(45deg, #1976d2, #4285f4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+        
+        .payment-container h2::before {
+            content: '💳';
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            animation: cardFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes titlePulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+        
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(-50%) rotate(0deg); }
+            50% { transform: translateY(-60%) rotate(5deg); }
+        }
+        
+        .membership-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .membership-info h3 {
+            color: #2196f3;
+            margin-bottom: 15px;
+        }
+        
+        .price-section {
+            margin-bottom: 30px;
+        }
+        
+        .price-display {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+        
+        .price-amount {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .price-duration {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+        
+        .payment-method {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border: 2px solid #e3f2fd;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .payment-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(33, 150, 243, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .payment-method:hover {
+            border-color: #2196f3;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.15);
+        }
+        
+        .payment-method:hover::before {
+            left: 100%;
+        }
+        
+        .payment-method.selected {
+            border-color: #2196f3;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .payment-method input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .payment-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .wechat-icon {
+            background: linear-gradient(135deg, #07c160, #05a34a);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(7, 193, 96, 0.3);
+        }
+        
+        .wechat-icon::before {
+            content: '💬';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            filter: brightness(2);
+        }
+        
+        .alipay-icon {
+            background: linear-gradient(135deg, #1677ff, #0d52cc);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(22, 119, 255, 0.3);
+        }
+        
+        .alipay-icon::before {
+            content: '💰';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            filter: brightness(2);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #4285f4, #1976d2, #0d47a1);
+            background-size: 200% 200%;
+            color: white;
+            padding: 18px 45px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(66, 133, 244, 0.4);
+            animation: btnPulse 4s ease-in-out infinite;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(66, 133, 244, 0.5);
+            background-position: 100% 0;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(-2px) scale(1.01);
+        }
+        
+        @keyframes btnPulse {
+            0%, 100% { 
+                box-shadow: 0 12px 35px rgba(66, 133, 244, 0.4),
+                           0 0 0 0 rgba(66, 133, 244, 0.7);
+            }
+            50% { 
+                box-shadow: 0 12px 35px rgba(66, 133, 244, 0.4),
+                           0 0 0 15px rgba(66, 133, 244, 0);
+            }
+        }
+        
+        .back-btn {
+            background: linear-gradient(45deg, #78909c, #607d8b);
+            background-size: 200% 200%;
+            padding: 15px 35px;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 8px 25px rgba(96, 125, 139, 0.3);
+            animation: none;
+        }
+        
+        .back-btn:hover {
+            background-position: 100% 0;
+            box-shadow: 0 12px 30px rgba(96, 125, 139, 0.4);
+        }
+        
+        .qq-channel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .qq-channel h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .qq-link {
+            color: #2196f3;
+            text-decoration: none;
+            font-weight: bold;
+            word-break: break-all;
+        }
+        
+        .qq-link:hover {
+            text-decoration: underline;
+        }
+        
+        .message {
+            padding: 18px 25px;
+            border-radius: 15px;
+            display: none;
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            min-width: 300px;
+            max-width: 450px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 2px solid transparent;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15),
+                        0 5px 15px rgba(0, 0, 0, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 1s ease;
+        }
+        
+        .message.show {
+            display: block !important;
+            transform: translateX(-50%) translateY(120px);
+            opacity: 1;
+        }
+        
+        .message.show::before {
+            left: 100%;
+        }
+        
+        .message.hide {
+            transform: translateX(-50%) translateY(-100px);
+            opacity: 0;
+        }
+        
+        .message.success {
+            background: linear-gradient(135deg, rgba(212, 237, 218, 0.95) 0%, rgba(195, 230, 203, 0.95) 100%);
+            color: #155724;
+            border-color: rgba(195, 230, 203, 0.8);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
+        }
+        
+        .message.success::after {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            animation: checkBounce 0.6s ease-out 0.3s both;
+        }
+        
+        .message.error {
+            background: linear-gradient(135deg, rgba(248, 215, 218, 0.95) 0%, rgba(245, 198, 203, 0.95) 100%);
+            color: #721c24;
+            border-color: rgba(245, 198, 203, 0.8);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.2);
+        }
+        
+        .message.error::after {
+            content: '✗';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            color: #dc3545;
+            animation: errorShake 0.6s ease-out 0.3s both;
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes messageSlideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+        
+        @keyframes checkBounce {
+            0% { transform: translateY(-50%) scale(0); }
+            50% { transform: translateY(-50%) scale(1.3); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            25% { transform: translateY(-50%) translateX(-5px); }
+            75% { transform: translateY(-50%) translateX(5px); }
+        }
+        
+        /* 确认模态框样式 */
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        .confirmation-content {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2),
+                        0 0 0 1px rgba(255, 255, 255, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .confirmation-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(66, 133, 244, 0.02), transparent);
+            animation: modalGlow 20s linear infinite;
+        }
+        
+        .confirmation-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+        
+        .confirmation-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .confirm-btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .confirm-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .confirm-yes {
+            background: linear-gradient(45deg, #4285f4, #1976d2);
+            color: white;
+            box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+        }
+        
+        .confirm-yes:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(66, 133, 244, 0.4);
+        }
+        
+        .confirm-yes:hover::before {
+            left: 100%;
+        }
+        
+        .confirm-no {
+            background: linear-gradient(45deg, #78909c, #607d8b);
+            color: white;
+            box-shadow: 0 8px 25px rgba(96, 125, 139, 0.3);
+        }
+        
+        .confirm-no:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(96, 125, 139, 0.4);
+        }
+        
+        .confirm-no:hover::before {
+            left: 100%;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes modalGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>开通会员</h2>
+        
+        <div class="membership-info">
+            <h3>会员特权</h3>
+            <p>• 实时成绩查询</p>
+            <p>• 历史成绩记录</p>
+            <p>• 成绩趋势分析</p>
+            <p>• 专属客服支持</p>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="price-section">
+            <div class="price-display">
+                <div class="price-amount">¥39.9</div>
+                <div class="price-duration">月度会员</div>
+            </div>
+            <p class="price-note" style="text-align: center; color: #666; font-size: 14px;">体验价格，限时优惠</p>
+        </div>
+        
+        <div class="payment-methods">
+            <div class="payment-method" onclick="selectPayment('wechat')">
+                <input type="radio" name="payment" value="wechat" id="wechat">
+                <div class="payment-icon wechat-icon"></div>
+                <label for="wechat">微信支付</label>
+            </div>
+            
+            <div class="payment-method" onclick="selectPayment('alipay')">
+                <input type="radio" name="payment" value="alipay" id="alipay">
+                <div class="payment-icon alipay-icon"></div>
+                <label for="alipay">支付宝支付</label>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="confirmPayment()">确认支付</button>
+        <button class="btn back-btn" onclick="goBack()">返回</button>
+        
+    <!-- QQ频道确认模态框 -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <div class="confirmation-icon">💬</div>
+            <h3 style="margin-bottom: 15px; color: #333;">加入QQ频道</h3>
+            <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+                感谢您的支持！是否现在加入我们的QQ频道获取专属服务和最新资讯？
+            </p>
+            <div class="confirmation-buttons">
+                <button class="confirm-btn confirm-yes" onclick="joinQQChannel()">立即加入</button>
+                <button class="confirm-btn confirm-no" onclick="closeConfirmation()">稍后再说</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        let selectedPayment = '';
+        
+        function selectPayment(method) {
+            selectedPayment = method;
+            document.getElementById(method).checked = true;
+            
+            // 移除所有选中状态
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // 添加选中状态
+            document.getElementById(method).closest('.payment-method').classList.add('selected');
+        }
+        
+        function confirmPayment() {
+            if (!selectedPayment) {
+                showMessage('请选择支付方式！', 'error');
+                return;
+            }
+            
+            // 禁用按钮防止重复点击
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '正在处理...';
+            
+            // 模拟支付过程
+            showMessage('正在处理支付...', 'success');
+            
+            setTimeout(() => {
+                // 模拟支付失败
+                showMessage('支付加载失败！请加入QQ频道以解决问题。', 'error');
+                
+                // 恢复按钮状态
+                btn.disabled = false;
+                btn.textContent = '确认支付';
+                
+                // 2秒后显示QQ频道确认模态框
+                setTimeout(() => {
+                    const modal = document.getElementById('confirmationModal');
+                    modal.style.display = 'flex';
+                }, 2000);
+            }, 2000);
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            
+            // 如果正在显示其他消息，先隐藏
+            if (messageDiv.style.display === 'block') {
+                messageDiv.style.animation = 'messageSlideOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    showNewMessage(text, type);
+                }, 300);
+            } else {
+                showNewMessage(text, type);
+            }
+        }
+        
+        function showNewMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            messageDiv.style.animation = 'messageSlideIn 0.5s ease-out forwards';
+            
+            // 添加光效动画
+            setTimeout(() => {
+                messageDiv.classList.add('show');
+            }, 100);
+            
+            // 成功消息不自动隐藏，错误消息4秒后隐藏
+            if (type === 'error') {
+                setTimeout(() => {
+                    hideMessage();
+                }, 4000);
+            } else if (type === 'success' && !text.includes('支付成功')) {
+                setTimeout(() => {
+                    hideMessage();
+                }, 3000);
+            }
+        }
+        
+        function hideMessage() {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.animation = 'messageSlideOut 0.4s ease-out forwards';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+                messageDiv.classList.remove('show');
+            }, 400);
+        }
+        
+        // 加入QQ频道
+        function joinQQChannel() {
+            window.open('https://pd.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&attaContentID=f2dceda92a9442daa093ce035fc73d77&biz=ka&businessType=5&from=246611&inviteCode=2qRbkhAKnrf&mainSourceId=qr_code&subSourceId=pic4&b=5', '_blank');
+            closeConfirmation();
+            // 跳转回主页
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+        
+        // 关闭确认模态框
+        function closeConfirmation() {
+            const modal = document.getElementById('confirmationModal');
+            modal.style.display = 'none';
+            // 跳转回主页
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        }
+        
+        // 页面加载时默认选中微信支付
+        window.onload = function() {
+            selectPayment('wechat');
+        };
+    </script>
+</body>
+</html>

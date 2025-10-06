@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邀请码验证 - 云成绩成绩查询系统 | 学生注册入口</title>
+    <script src="assets/js/data-sync.js"></script>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="云成绩成绩查询系统邀请码验证页面。输入有效邀请码即可注册账号，开始使用专业的成绩管理和查询服务。">
+    <meta name="keywords" content="邀请码,注册,成绩查询,学生注册,验证码,云成绩,教育系统,学校系统">
+    <meta name="author" content="云成绩团队">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="zh-CN">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="邀请码验证 - 云成绩">
+    <meta property="og:description" content="云成绩成绩查询系统邀请码验证页面，学生注册入口">
+    <meta property="og:url" content="https://yunscores.com/invite-code.html">
+    <meta property="og:site_name" content="云成绩">
+    <meta property="og:locale" content="zh_CN">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="邀请码验证 - 云成绩">
+    <meta name="twitter:description" content="云成绩成绩查询系统邀请码验证页面">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://yunscores.com/invite-code.html">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "邀请码验证",
+        "description": "云成绩成绩查询系统邀请码验证页面",
+        "url": "https://yunscores.com/invite-code.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "云成绩",
+            "url": "https://yunscores.com"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #0d47a1 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ffffff" opacity="0.1"><animateTransform attributeName="transform" type="translate" values="0,0; 5,5; 0,0" dur="4s" repeatCount="indefinite"/></circle><circle cx="80" cy="30" r="1.5" fill="%23ffffff" opacity="0.1"><animateTransform attributeName="transform" type="translate" values="0,0; -3,7; 0,0" dur="6s" repeatCount="indefinite"/></circle><circle cx="60" cy="80" r="1" fill="%23ffffff" opacity="0.1"><animateTransform attributeName="transform" type="translate" values="0,0; 8,-4; 0,0" dur="5s" repeatCount="indefinite"/></circle></svg>');
+            animation: floatingDots 20s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes floatingDots {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+        }
+        
+        .verification-container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .verification-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, rgba(66, 133, 244, 0.1), rgba(25, 118, 210, 0.05));
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite;
+        }
+        
+        .verification-container h2 {
+            color: #1976d2;
+            margin-bottom: 20px;
+            font-size: 32px;
+            position: relative;
+        }
+        
+        .verification-container h2::before {
+            content: '🔐';
+            margin-right: 10px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .device-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 18px 25px;
+            border: 2px solid #e3f2fd;
+            border-radius: 20px;
+            font-size: 20px;
+            text-align: center;
+            letter-spacing: 3px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1),
+                        0 10px 30px rgba(33, 150, 243, 0.15),
+                        inset 0 2px 10px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px) scale(1.02);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+        }
+        
+        .form-group input::placeholder {
+            color: #bbbbbb;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        
+        .form-group input:disabled {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #2196f3, #1976d2, #4285f4);
+            background-size: 300% 300%;
+            color: white;
+            padding: 18px 45px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3),
+                        0 0 0 0 rgba(33, 150, 243, 0.7);
+            animation: verifyButtonPulse 4s ease-in-out infinite;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(33, 150, 243, 0.4),
+                        0 0 0 10px rgba(33, 150, 243, 0);
+            background-position: 100% 0;
+        }
+        
+        .btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(-2px) scale(1.01);
+        }
+        
+        @keyframes verifyButtonPulse {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3),
+                           0 0 0 0 rgba(33, 150, 243, 0.7);
+            }
+            50% {
+                box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3),
+                           0 0 0 8px rgba(33, 150, 243, 0);
+            }
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            padding: 10px 30px;
+            font-size: 16px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            min-width: 300px;
+            max-width: 500px;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15),
+                        0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .message.show {
+            display: block !important;
+            transform: translateX(-50%) translateY(120px);
+            opacity: 1;
+        }
+        
+        .message.hide {
+            transform: translateX(-50%) translateY(-100px);
+            opacity: 0;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .attempts-info {
+            background: #e2e3e5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .restriction-info {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 20px;
+            border-radius: 8px;
+            color: #721c24;
+            margin-bottom: 20px;
+        }
+        
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc3545;
+            margin: 10px 0;
+        }
+        
+        .permanent-ban {
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .rules-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .rules-section h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .rules-section ul {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .rules-section li {
+            margin-bottom: 5px;
+        }
+        
+        .invite-code-details {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .invite-code-details h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .invite-code-details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .remaining-uses-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <h2>邀请码验证</h2>
+        
+        <div class="device-info" id="deviceInfo">
+            设备指纹：<span id="deviceFingerprint">正在生成...</span>
+        </div>
+        
+        <div id="message" class="message"></div>
+        <div id="attemptsInfo" class="attempts-info" style="display: none;"></div>
+        <div id="restrictionInfo" class="restriction-info" style="display: none;"></div>
+        <div id="permanentBan" class="permanent-ban" style="display: none;"></div>
+        
+        <!-- 邀请码详情显示区域 -->
+        <div id="inviteCodeDetails" class="invite-code-details" style="display: none;">
+            <h4>邀请码详情</h4>
+            <p>邀请码卡号：<span id="detailCode"></span></p>
+            <p>有效时间：<span id="detailValidDays"></span></p>
+            <p>剩余次数：<span id="detailRemainingUses"></span></p>
+        </div>
+        
+        <!-- 剩余次数警告 -->
+        <div id="remainingUsesWarning" class="remaining-uses-warning" style="display: none;">
+            此页面的用户创建成功后若还想创建用户，请再次使用您当前的邀请码验证，以完成创建用户的操作，故当创建用户的次数用完后就不能创建用户了，并且要和验证邀请码的网页交互
+        </div>
+        
+        <form id="verificationForm">
+            <div class="form-group">
+                <label for="inviteCode">请输入邀请码</label>
+                <input type="text" id="inviteCode" name="inviteCode" maxlength="20" placeholder="输入邀请码" required>
+            </div>
+            
+            <button type="submit" class="btn" id="verifyBtn">验证邀请码</button>
+        </form>
+        
+        <button class="btn back-btn" onclick="goBack()">返回主页</button>
+        
+        <div class="rules-section">
+            <h4>使用规则</h4>
+            <ul>
+                <li>每个邀请码只能使用一次</li>
+                <li>一旦邀请码输入成功后视为已使用</li>
+                <li>连续错误5次将限10分钟</li>
+                <li>第二次连续错误3次将限30分钟</li>
+                <li>第三次连续错误将永久封禁设备</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 设备指纹生成
+        function generateDeviceFingerprint() {
+            // 简化的设备指纹生成，实际应用中应该更复杂
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = "14px 'Arial'";
+            ctx.fillText('device fingerprint test', 2, 2);
+            const txt = canvas.toDataURL();
+            
+            // 结合时间戳和随机数
+            const fingerprint = btoa(txt + Date.now() + Math.random()).substring(0, 32);
+            return fingerprint;
+        }
+        
+        // 获取设备指纹
+        function getDeviceFingerprint() {
+            let fingerprint = localStorage.getItem('deviceFingerprint');
+            if (!fingerprint) {
+                fingerprint = generateDeviceFingerprint();
+                localStorage.setItem('deviceFingerprint', fingerprint);
+            }
+            return fingerprint;
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示设备指纹
+            document.getElementById('deviceFingerprint').textContent = getDeviceFingerprint();
+            
+            // 检查设备限制状态
+            checkDeviceRestriction();
+            
+            // 启动数据同步
+            dataSync.startSync(3000);
+        });
+        
+        // 检查设备限制状态
+        function checkDeviceRestriction() {
+            const fingerprint = getDeviceFingerprint();
+            const restrictionKey = `restriction_${fingerprint}`;
+            const restrictionData = localStorage.getItem(restrictionKey);
+            
+            if (restrictionData) {
+                try {
+                    const data = JSON.parse(restrictionData);
+                    const now = Date.now();
+                    
+                    // 检查是否永久封禁
+                    if (data.level === 3) {
+                        showPermanentBan();
+                        return;
+                    }
+                    
+                    // 检查是否在限制时间内
+                    if (data.endTime && now < data.endTime) {
+                        showRestrictionInfo(data);
+                        return;
+                    }
+                } catch (e) {
+                    console.error('解析限制数据出错:', e);
+                }
+            }
+            
+            // 没有限制，显示尝试次数信息
+            showAttemptsInfo();
+        }
+        
+        // 显示尝试次数信息
+        function showAttemptsInfo() {
+            const fingerprint = getDeviceFingerprint();
+            const restrictionKey = `restriction_${fingerprint}`;
+            const restrictionData = localStorage.getItem(restrictionKey);
+            
+            let attempts = 0;
+            if (restrictionData) {
+                try {
+                    const data = JSON.parse(restrictionData);
+                    attempts = data.attempts || 0;
+                } catch (e) {
+                    console.error('解析尝试次数出错:', e);
+                }
+            }
+            
+            const remaining = 5 - attempts;
+            if (remaining > 0) {
+                document.getElementById('attemptsInfo').innerHTML = `您还有 ${remaining} 次尝试机会`;
+                document.getElementById('attemptsInfo').style.display = 'block';
+            }
+        }
+        
+        // 显示限制信息
+        function showRestrictionInfo(data) {
+            const now = Date.now();
+            const remainingTime = data.endTime - now;
+            
+            if (remainingTime > 0) {
+                const minutes = Math.ceil(remainingTime / 60000);
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                
+                let timeText = '';
+                if (hours > 0) {
+                    timeText = `${hours}小时${mins}分钟`;
+                } else {
+                    timeText = `${minutes}分钟`;
+                }
+                
+                document.getElementById('restrictionInfo').innerHTML = `
+                    <h3>⚠️ 设备受限</h3>
+                    <p>您的设备因多次验证失败已被临时限制</p>
+                    <p>限制级别：第${data.level}级</p>
+                    <p>剩余时间：<span class="countdown">${timeText}</span></p>
+                    <p>请等待限制时间结束后再尝试</p>
+                `;
+                document.getElementById('restrictionInfo').style.display = 'block';
+                
+                // 禁用表单
+                document.getElementById('inviteCode').disabled = true;
+                document.getElementById('verifyBtn').disabled = true;
+            }
+        }
+        
+        // 显示永久封禁
+        function showPermanentBan() {
+            document.getElementById('permanentBan').innerHTML = `
+                <h3>🚫 设备已被永久封禁</h3>
+                <p>您的设备因多次验证失败已被永久封禁</p>
+                <p>如需解封请联系管理员</p>
+            `;
+            document.getElementById('permanentBan').style.display = 'block';
+            
+            // 禁用表单
+            document.getElementById('inviteCode').disabled = true;
+            document.getElementById('verifyBtn').disabled = true;
+        }
+        
+        // 验证邀请码表单提交
+        document.getElementById('verificationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const inviteCode = document.getElementById('inviteCode').value.trim();
+            if (!inviteCode) {
+                showMessage('请输入邀请码！', 'error');
+                return;
+            }
+            
+            // 验证邀请码
+            verifyInviteCode(inviteCode);
+        });
+        
+        // 验证邀请码
+        function verifyInviteCode(code) {
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            const inviteCodeInfo = inviteCodes[code];
+            
+            if (!inviteCodeInfo) {
+                showMessage('邀请码不存在！', 'error');
+                handleFailedAttempt();
+                return;
+            }
+            
+            // 检查邀请码是否已使用
+            if (inviteCodeInfo.used && (!inviteCodeInfo.maxUses || inviteCodeInfo.usedCount >= inviteCodeInfo.maxUses)) {
+                showMessage('邀请码已使用或次数已用完！', 'error');
+                handleFailedAttempt();
+                return;
+            }
+            
+            // 检查邀请码是否过期
+            if (inviteCodeInfo.expiresAt && new Date(inviteCodeInfo.expiresAt) < new Date()) {
+                showMessage('邀请码已过期！', 'error');
+                handleFailedAttempt();
+                return;
+            }
+            
+            // 验证成功
+            handleSuccessfulVerification(code, inviteCodeInfo);
+        }
+        
+        // 处理验证成功
+        function handleSuccessfulVerification(code, inviteCodeInfo) {
+            // 更新邀请码使用状态
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            inviteCodes[code].used = true;
+            inviteCodes[code].usedTime = new Date().toISOString();
+            inviteCodes[code].usedCount = (inviteCodes[code].usedCount || 0) + 1;
+            
+            localStorage.setItem('inviteCodes', JSON.stringify(inviteCodes));
+            
+            // 保存当前邀请码到本地存储，供注册页面使用
+            localStorage.setItem('currentInviteCode', code);
+            
+            // 显示邀请码详情
+            showInviteCodeDetails(code, inviteCodeInfo);
+            
+            // 如果剩余次数小于等于2，显示警告
+            const remainingUses = (inviteCodeInfo.maxUses || 1) - (inviteCodes[code].usedCount || 0);
+            if (remainingUses <= 2) {
+                document.getElementById('remainingUsesWarning').style.display = 'block';
+            }
+            
+            showMessage('邀请码验证成功！', 'success');
+            
+            // 3秒后跳转到注册页面
+            setTimeout(() => {
+                window.location.href = 'register.html?invite=' + encodeURIComponent(code);
+            }, 3000);
+        }
+        
+        // 显示邀请码详情
+        function showInviteCodeDetails(code, info) {
+            document.getElementById('detailCode').textContent = code;
+            
+            if (info.validDays === -1) {
+                document.getElementById('detailValidDays').textContent = '永久有效';
+            } else {
+                document.getElementById('detailValidDays').textContent = `${info.validDays}天`;
+            }
+            
+            const remainingUses = (info.maxUses || 1) - (info.usedCount || 0);
+            document.getElementById('detailRemainingUses').textContent = `${remainingUses}次`;
+            
+            document.getElementById('inviteCodeDetails').style.display = 'block';
+        }
+        
+        // 处理验证失败
+        function handleFailedAttempt() {
+            const fingerprint = getDeviceFingerprint();
+            const restrictionKey = `restriction_${fingerprint}`;
+            const restrictionData = localStorage.getItem(restrictionKey);
+            
+            let data = {
+                attempts: 1,
+                level: 0,
+                endTime: 0,
+                deviceFingerprint: fingerprint,
+                timestamp: Date.now()
+            };
+            
+            if (restrictionData) {
+                try {
+                    data = JSON.parse(restrictionData);
+                    data.attempts = (data.attempts || 0) + 1;
+                    data.timestamp = Date.now();
+                } catch (e) {
+                    console.error('解析限制数据出错:', e);
+                }
+            }
+            
+            // 根据失败次数设置限制级别
+            if (data.attempts >= 5) {
+                // 第一次连续错误5次，限制10分钟
+                data.level = 1;
+                data.endTime = Date.now() + 10 * 60 * 1000;
+            } else if (data.attempts >= 3) {
+                // 第二次连续错误3次，限制30分钟
+                data.level = 2;
+                data.endTime = Date.now() + 30 * 60 * 1000;
+            }
+            
+            // 如果已经是第3级限制，则永久封禁
+            if (data.level >= 3) {
+                data.level = 3;
+                data.endTime = 0; // 永久
+            }
+            
+            localStorage.setItem(restrictionKey, JSON.stringify(data));
+            
+            // 更新显示
+            checkDeviceRestriction();
+        }
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            messageDiv.classList.add('show');
+            
+            // 自动隐藏错误消息
+            if (type !== 'success') {
+                setTimeout(() => {
+                    messageDiv.classList.remove('show');
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            }
+        }
+        
+        // 返回主页
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

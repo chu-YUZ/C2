@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成绩查询 - 云成绩</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #0d47a1 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 25% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            animation: backgroundPulse 15s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .grades-container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grades-container::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, rgba(66, 133, 244, 0.05), rgba(25, 118, 210, 0.02));
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .grades-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .grades-header h2 {
+            color: #1976d2;
+            font-size: 32px;
+            position: relative;
+        }
+        
+        .grades-header h2::before {
+            content: '📊';
+            margin-right: 12px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(45deg, #03a9f4, #0288d1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-summary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 251, 255, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 35px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .user-summary::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(66, 133, 244, 0.03), transparent);
+            animation: summaryGlow 30s linear infinite;
+        }
+        
+        @keyframes summaryGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .summary-item {
+            text-align: center;
+            position: relative;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(240, 248, 255, 0.8) 100%);
+            border-radius: 15px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(33, 150, 243, 0.1);
+            cursor: pointer;
+        }
+        
+        .summary-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.15);
+            border-color: rgba(33, 150, 243, 0.3);
+        }
+        
+        .summary-item .label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .summary-item .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1976d2;
+            position: relative;
+            animation: valueCount 2s ease-out;
+        }
+        
+        @keyframes valueCount {
+            from { 
+                opacity: 0;
+                transform: translateY(10px) scale(0.8);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        .grades-table th,
+        .grades-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .grades-table th {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+        
+        .grades-table tbody tr {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .grades-table tbody tr:hover {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.1);
+        }
+        
+        .grades-table tbody tr:nth-child(even) {
+            background: rgba(248, 251, 255, 0.5);
+        }
+        
+        .grades-table tbody tr:nth-child(odd) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .score-cell {
+            font-weight: bold;
+            font-size: 20px;
+            position: relative;
+            padding: 15px;
+        }
+        
+        .score-cell::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 3px;
+            width: 0;
+            background: currentColor;
+            transition: width 0.4s ease;
+            border-radius: 2px;
+        }
+        
+        .score-cell:hover::before {
+            width: 80%;
+        }
+        
+        .score-excellent {
+            color: #28a745;
+        }
+        
+        .score-good {
+            color: #17a2b8;
+        }
+        
+        .score-average {
+            color: #ffc107;
+        }
+        
+        .score-poor {
+            color: #dc3545;
+        }
+        
+        .stats-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .stats-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        
+        .stats-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .no-grades {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            padding: 50px;
+        }
+        
+        .message {
+            padding: 18px 25px;
+            border-radius: 15px;
+            display: none;
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            min-width: 300px;
+            max-width: 450px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 2px solid transparent;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15),
+                        0 5px 15px rgba(0, 0, 0, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .message.show {
+            display: block !important;
+            transform: translateX(-50%) translateY(120px);
+            opacity: 1;
+        }
+        
+        .message.hide {
+            transform: translateX(-50%) translateY(-100px);
+            opacity: 0;
+        }
+        
+        .message.success {
+            background: linear-gradient(135deg, rgba(212, 237, 218, 0.95) 0%, rgba(195, 230, 203, 0.95) 100%);
+            color: #155724;
+            border: 1px solid rgba(195, 230, 203, 0.8);
+            box-shadow: 0 15px 35px rgba(40, 167, 69, 0.25),
+                        0 5px 15px rgba(40, 167, 69, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        .message.info {
+            background: linear-gradient(135deg, rgba(209, 236, 241, 0.95) 0%, rgba(190, 227, 248, 0.95) 100%);
+            color: #0c5460;
+            border: 1px solid rgba(190, 227, 248, 0.8);
+            box-shadow: 0 15px 35px rgba(12, 84, 96, 0.25),
+                        0 5px 15px rgba(12, 84, 96, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .grades-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .grades-table {
+                font-size: 14px;
+            }
+            
+            .grades-table th,
+            .grades-table td {
+                padding: 10px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">云成绩 - 成绩查询</div>
+            <div class="user-info">
+                <span id="welcomeText">欢迎，用户</span>
+                <a href="user-home.html" class="back-btn">返回主页</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="grades-container">
+            <div class="grades-header">
+                <h2>我的成绩</h2>
+                <button class="refresh-btn" onclick="refreshGrades()">刷新成绩</button>
+            </div>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="user-summary" id="userSummary">
+                <!-- 用户摘要信息 -->
+            </div>
+            
+            <div id="gradesContent">
+                <!-- 成绩内容将通过JavaScript动态加载 -->
+            </div>
+            
+            <div class="stats-section" id="statsSection" style="display: none;">
+                <div class="stats-card">
+                    <h3>成绩统计</h3>
+                    <div id="statsInfo">
+                        <!-- 统计信息 -->
+                    </div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>成绩趋势</h3>
+                    <div class="chart-placeholder">
+                        成绩趋势图（会员功能）
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = '';
+        let userGrades = [];
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            loadUserInfo();
+            loadGrades();
+        };
+        
+        // 加载用户信息
+        function loadUserInfo() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const userInfo = users[currentUser];
+            
+            if (userInfo) {
+                document.getElementById('welcomeText').textContent = `欢迎，${userInfo.name || currentUser}`;
+                
+                // 显示用户摘要
+                const summaryDiv = document.getElementById('userSummary');
+                summaryDiv.innerHTML = `
+                    <div class="summary-item">
+                        <div class="label">姓名</div>
+                        <div class="value">${userInfo.name || '未设置'}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">考号</div>
+                        <div class="value">${userInfo.examNumber || '未设置'}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">学校</div>
+                        <div class="value">${userInfo.school || '未设置'}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">成绩记录</div>
+                        <div class="value">${(userInfo.grades || []).length} 科</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 加载成绩
+        function loadGrades() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const userInfo = users[currentUser];
+            const gradesContent = document.getElementById('gradesContent');
+            
+            if (userInfo && userInfo.grades && userInfo.grades.length > 0) {
+                userGrades = userInfo.grades;
+                
+                // 创建成绩表格
+                let tableHtml = `
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>科目</th>
+                                <th>成绩</th>
+                                <th>等级</th>
+                                <th>考试名称</th>
+                                <th>考试日期</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                userGrades.forEach((grade, index) => {
+                    const gradeLevel = getGradeLevel(grade.score);
+                    const scoreClass = getScoreClass(grade.score);
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${grade.subject}</td>
+                            <td class="score-cell ${scoreClass}">${grade.score}</td>
+                            <td>${gradeLevel}</td>
+                            <td>${grade.examName}</td>
+                            <td>${grade.date || '未设置'}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                
+                gradesContent.innerHTML = tableHtml;
+                
+                // 显示统计信息
+                showStatistics();
+                document.getElementById('statsSection').style.display = 'grid';
+                
+            } else {
+                gradesContent.innerHTML = '<div class="no-grades">暂无成绩记录</div>';
+                document.getElementById('statsSection').style.display = 'none';
+            }
+        }
+        
+        // 获取成绩等级
+        function getGradeLevel(score) {
+            if (score >= 90) return '优秀';
+            if (score >= 80) return '良好';
+            if (score >= 70) return '中等';
+            if (score >= 60) return '及格';
+            return '不及格';
+        }
+        
+        // 获取成绩样式类
+        function getScoreClass(score) {
+            if (score >= 90) return 'score-excellent';
+            if (score >= 80) return 'score-good';
+            if (score >= 70) return 'score-average';
+            return 'score-poor';
+        }
+        
+        // 显示统计信息
+        function showStatistics() {
+            if (userGrades.length === 0) return;
+            
+            const scores = userGrades.map(g => g.score);
+            const totalScore = scores.reduce((sum, score) => sum + score, 0);
+            const averageScore = (totalScore / scores.length).toFixed(1);
+            const maxScore = Math.max(...scores);
+            const minScore = Math.min(...scores);
+            
+            // 计算各等级数量
+            const excellent = scores.filter(s => s >= 90).length;
+            const good = scores.filter(s => s >= 80 && s < 90).length;
+            const average = scores.filter(s => s >= 70 && s < 80).length;
+            const pass = scores.filter(s => s >= 60 && s < 70).length;
+            const fail = scores.filter(s => s < 60).length;
+            
+            const statsInfo = document.getElementById('statsInfo');
+            statsInfo.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
+                    <div><strong>总科目数：</strong>${userGrades.length}</div>
+                    <div><strong>平均分：</strong><span style="color: #667eea; font-weight: bold;">${averageScore}</span></div>
+                    <div><strong>最高分：</strong><span style="color: #28a745; font-weight: bold;">${maxScore}</span></div>
+                    <div><strong>最低分：</strong><span style="color: #dc3545; font-weight: bold;">${minScore}</span></div>
+                    <div><strong>优秀(≥90)：</strong>${excellent} 科</div>
+                    <div><strong>良好(80-89)：</strong>${good} 科</div>
+                    <div><strong>中等(70-79)：</strong>${average} 科</div>
+                    <div><strong>及格(60-69)：</strong>${pass} 科</div>
+                    <div><strong>不及格(<60)：</strong>${fail} 科</div>
+                    <div><strong>及格率：</strong>${(((userGrades.length - fail) / userGrades.length) * 100).toFixed(1)}%</div>
+                </div>
+            `;
+        }
+        
+        // 刷新成绩
+        function refreshGrades() {
+            showMessage('正在刷新成绩...', 'info');
+            
+            // 模拟刷新过程
+            setTimeout(() => {
+                // 这里可以添加从服务器获取最新成绩的逻辑
+                // 现在只是重新加载本地数据
+                loadGrades();
+                showMessage('成绩已刷新！', 'success');
+            }, 1500);
+        }
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            
+            // 如果正在显示其他消息，先隐藏
+            if (messageDiv.classList.contains('show')) {
+                hideMessage();
+                setTimeout(() => {
+                    showNewMessage(text, type);
+                }, 500);
+            } else {
+                showNewMessage(text, type);
+            }
+        }
+        
+        function showNewMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // 触发显示动画
+            setTimeout(() => {
+                messageDiv.classList.add('show');
+            }, 50);
+            
+            // 自动隐藏
+            setTimeout(() => {
+                hideMessage();
+            }, 3000);
+        }
+        
+        function hideMessage() {
+            const messageDiv = document.getElementById('message');
+            messageDiv.classList.remove('show');
+            messageDiv.classList.add('hide');
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+                messageDiv.classList.remove('hide');
+            }, 500);
+        }
+    </script>
+</body>
+</html>

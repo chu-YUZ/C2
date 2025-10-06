@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /invite-code.html
+Allow: /register.html
+Allow: /user-home.html
+Allow: /grades.html
+Allow: /payment.html
+
+# 禁止搜索引擎抓取管理页面
+Disallow: /admin.html
+Disallow: /admin-login.html
+
+# 禁止搜索引擎抓取服务器文件
+Disallow: /server.js
+Disallow: /*.bat
+Disallow: /*.exe
+
+# 允许抓取sitemap
+Sitemap: https://yunscores.com/sitemap.xml
+
+# 爬取延迟（毫秒）
+Crawl-delay: 1
