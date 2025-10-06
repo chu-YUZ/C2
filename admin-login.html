@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - 云成绩</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        
+        .admin-logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .admin-subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2196f3;
+        }
+        
+        .login-btn {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .back-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        
+        .back-link:hover {
+            color: #1976d2;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            min-width: 300px;
+            max-width: 500px;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15),
+                        0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .message.show {
+            display: block !important;
+            transform: translateX(-50%) translateY(120px);
+            opacity: 1;
+        }
+        
+        .message.hide {
+            transform: translateX(-50%) translateY(-100px);
+            opacity: 0;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .security-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .security-notice .icon {
+            font-size: 16px;
+            margin-right: 8px;
+        }
+        
+        .attempts-warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="admin-logo">🔐 管理后台</div>
+        <div class="admin-subtitle">云成绩系统管理控制台</div>
+        
+        <div class="security-notice">
+            <span class="icon">⚠️</span>
+            请使用管理员账号登录，未经授权的访问将被记录。
+        </div>
+        
+        <div id="message" class="message"></div>
+        <div id="attemptsWarning" class="attempts-warning" style="display: none;"></div>
+        
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="adminUsername">管理员账号</label>
+                <input type="text" id="adminUsername" name="adminUsername" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="adminPassword">管理员密码</label>
+                <input type="password" id="adminPassword" name="adminPassword" required>
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">登录管理后台</button>
+        </form>
+        
+        <a href="index.html" class="back-link">← 返回主页</a>
+    </div>
+
+    <script>
+        let loginAttempts = 0;
+        const maxAttempts = 5;
+        const lockoutTime = 30 * 60 * 1000; // 30分钟
+        
+        // 页面加载时检查锁定状态
+        window.onload = function() {
+            checkLockoutStatus();
+            loadLoginAttempts();
+        };
+        
+        // 检查锁定状态
+        function checkLockoutStatus() {
+            const lockoutData = localStorage.getItem('adminLockout');
+            if (lockoutData) {
+                const lockout = JSON.parse(lockoutData);
+                const now = Date.now();
+                
+                if (lockout.until > now) {
+                    const remaining = Math.ceil((lockout.until - now) / 60000);
+                    disableLogin(`管理员登录已被锁定，剩余时间：${remaining} 分钟`);
+                    
+                    // 开始倒计时
+                    startLockoutCountdown(lockout.until);
+                    return;
+                } else {
+                    // 锁定时间已过，清除锁定
+                    localStorage.removeItem('adminLockout');
+                    loginAttempts = 0;
+                    localStorage.removeItem('adminLoginAttempts');
+                }
+            }
+        }
+        
+        // 加载登录尝试次数
+        function loadLoginAttempts() {
+            const attempts = localStorage.getItem('adminLoginAttempts');
+            if (attempts) {
+                loginAttempts = parseInt(attempts);
+                updateAttemptsWarning();
+            }
+        }
+        
+        // 更新尝试次数警告
+        function updateAttemptsWarning() {
+            if (loginAttempts > 0) {
+                const remaining = maxAttempts - loginAttempts;
+                const warningDiv = document.getElementById('attemptsWarning');
+                warningDiv.textContent = `登录失败 ${loginAttempts} 次，还有 ${remaining} 次机会。连续失败 ${maxAttempts} 次将锁定 30 分钟。`;
+                warningDiv.style.display = 'block';
+            }
+        }
+        
+        // 开始锁定倒计时
+        function startLockoutCountdown(until) {
+            const interval = setInterval(() => {
+                const now = Date.now();
+                const remaining = Math.ceil((until - now) / 60000);
+                
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    enableLogin();
+                    localStorage.removeItem('adminLockout');
+                    loginAttempts = 0;
+                    localStorage.removeItem('adminLoginAttempts');
+                    showMessage('锁定时间已结束，可以重新登录。', 'success');
+                } else {
+                    const btn = document.getElementById('loginBtn');
+                    btn.textContent = `锁定中 (${remaining} 分钟)`;
+                }
+            }, 60000); // 每分钟更新一次
+        }
+        
+        // 禁用登录
+        function disableLogin(message) {
+            document.getElementById('adminUsername').disabled = true;
+            document.getElementById('adminPassword').disabled = true;
+            document.getElementById('loginBtn').disabled = true;
+            document.getElementById('loginBtn').textContent = '已锁定';
+            showMessage(message, 'error');
+        }
+        
+        // 启用登录
+        function enableLogin() {
+            document.getElementById('adminUsername').disabled = false;
+            document.getElementById('adminPassword').disabled = false;
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('loginBtn').textContent = '登录管理后台';
+            document.getElementById('attemptsWarning').style.display = 'none';
+        }
+        
+        // 处理登录表单提交
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            // 默认管理员账号和密码
+            const defaultAdminUsername = 'admin';
+            const defaultAdminPassword = 'admin123';
+            
+            // 也可以从localStorage获取自定义管理员账号
+            const customAdmin = JSON.parse(localStorage.getItem('adminAccount') || '{}');
+            const adminUsername = customAdmin.username || defaultAdminUsername;
+            const adminPassword = customAdmin.password || defaultAdminPassword;
+            
+            if (username === adminUsername && password === adminPassword) {
+                // 登录成功
+                localStorage.setItem('adminUser', username);
+                localStorage.removeItem('adminLoginAttempts');
+                loginAttempts = 0;
+                
+                showMessage('登录成功，正在跳转...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'admin/admin.html';
+                }, 1000);
+                
+            } else {
+                // 登录失败
+                loginAttempts++;
+                localStorage.setItem('adminLoginAttempts', loginAttempts.toString());
+                
+                if (loginAttempts >= maxAttempts) {
+                    // 锁定账号
+                    const lockoutUntil = Date.now() + lockoutTime;
+                    localStorage.setItem('adminLockout', JSON.stringify({
+                        until: lockoutUntil,
+                        attempts: loginAttempts
+                    }));
+                    
+                    disableLogin('连续登录失败次数过多，管理员登录已被锁定 30 分钟。');
+                    startLockoutCountdown(lockoutUntil);
+                } else {
+                    const remaining = maxAttempts - loginAttempts;
+                    showMessage(`登录失败！还有 ${remaining} 次尝试机会。`, 'error');
+                    updateAttemptsWarning();
+                }
+                
+                // 清空密码字段
+                document.getElementById('adminPassword').value = '';
+            }
+        });
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            if (type !== 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // 初始化默认数据（如果不存在）
+        function initializeDefaultData() {
+            // 初始化一些测试邀请码
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            if (Object.keys(inviteCodes).length === 0) {
+                inviteCodes['TEST2024'] = {
+                    used: false,
+                    createdAt: new Date().toISOString()
+                };
+                inviteCodes['DEMO2024'] = {
+                    used: false,
+                    createdAt: new Date().toISOString()
+                };
+                localStorage.setItem('inviteCodes', JSON.stringify(inviteCodes));
+            }
+        }
+        
+        // 页面加载时初始化默认数据
+        initializeDefaultData();
+    </script>
+</body>
+</html>

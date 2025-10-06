@@ -1,0 +1,2949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 云成绩</title>
+    <title>管理后台 - 云成绩</title>
+    <script src="assets/js/data-sync.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .admin-header {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .admin-logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+        
+        .admin-sidebar {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar-menu li {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .sidebar-menu li:last-child {
+            border-bottom: none;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .admin-content {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section-title {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn.danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+        
+        .btn.warning {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+        }
+        
+        .btn.success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2196f3;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .message {
+            padding: 18px 25px;
+            border-radius: 15px;
+            display: none;
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            min-width: 300px;
+            max-width: 450px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 2px solid transparent;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15),
+                        0 5px 15px rgba(0, 0, 0, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 1s ease;
+        }
+        
+        .message.show {
+            display: block !important;
+            transform: translateX(-50%) translateY(120px);
+            opacity: 1;
+        }
+        
+        .message.show::before {
+            left: 100%;
+        }
+        
+        .message.hide {
+            transform: translateX(-50%) translateY(-100px);
+            opacity: 0;
+        }
+        
+        .message.success {
+            background: linear-gradient(135deg, rgba(212, 237, 218, 0.95) 0%, rgba(195, 230, 203, 0.95) 100%);
+            color: #155724;
+            border-color: rgba(195, 230, 203, 0.8);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
+        }
+        
+        .message.success::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            animation: checkBounce 0.6s ease-out 0.3s both;
+        }
+        
+        .message.error {
+            background: linear-gradient(135deg, rgba(248, 215, 218, 0.95) 0%, rgba(245, 198, 203, 0.95) 100%);
+            color: #721c24;
+            border-color: rgba(245, 198, 203, 0.8);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.2);
+        }
+        
+        .message.error::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            color: #dc3545;
+            animation: errorShake 0.6s ease-out 0.3s both;
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes messageSlideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+        
+        @keyframes checkBounce {
+            0% { transform: translateY(-50%) scale(0); }
+            50% { transform: translateY(-50%) scale(1.3); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            25% { transform: translateY(-50%) translateX(-5px); }
+            75% { transform: translateY(-50%) translateX(5px); }
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-banned {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-used {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .announcement-priority-high {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .announcement-priority-medium {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .announcement-priority-low {
+            border-left: 4px solid #28a745;
+        }
+        
+        .announcement-sticky {
+            background: linear-gradient(45deg, #fff3e0, #ffe0b2) !important;
+        }
+        
+        .announcement-type-urgent {
+            background: linear-gradient(45deg, #ffebee, #ffcdd2);
+        }
+        
+        .announcement-type-warning {
+            background: linear-gradient(45deg, #fff8e1, #ffecb3);
+        }
+        
+        .announcement-type-info {
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+        }
+        
+        .announcement-stats {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #666;
+            margin-left: 8px;
+        }
+        
+        .status-unused {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        @media (max-width: 1024px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="admin-header-content">
+            <div class="admin-logo">云成绩 - 管理后台</div>
+            <div class="admin-user">
+                <span id="adminName">管理员</span>
+                <a href="../admin-login.html" class="logout-btn">退出登录</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" onclick="showSection('users')" class="active">用户管理</a></li>
+                <li><a href="#" onclick="showSection('inviteCodes')">邀请码管理</a></li>
+                <li><a href="#" onclick="showSection('announcements')">公告管理</a></li>
+                <li><a href="#" onclick="showSection('bannedDevices')">封号设备管理</a></li>
+                <li><a href="#" onclick="showSection('statistics')">统计信息</a></li>
+            </ul>
+        </div>
+        
+        <div class="admin-content">
+            <div id="message" class="message"></div>
+            
+            <!-- 用户管理 -->
+            <div id="users" class="content-section active">
+                <div class="section-header">
+                    <h2 class="section-title">用户管理</h2>
+                    <div>
+                        <button class="btn" onclick="showAddUserModal()">添加用户</button>
+                        <button class="btn warning" onclick="toggleBatchMode()" id="batchToggleBtn">批量操作</button>
+                    </div>
+                </div>
+                
+                <div id="batchActions" class="batch-actions" style="display: none; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn" onclick="selectAllUsers()">全选</button>
+                        <button class="btn" onclick="deselectAllUsers()">取消全选</button>
+                        <button class="btn danger" onclick="batchBanUsers()">批量封号</button>
+                        <button class="btn success" onclick="batchUnbanUsers()">批量解封</button>
+                        <button class="btn danger" onclick="batchDeleteUsers()">批量删除</button>
+                        <span id="selectedCount" style="margin-left: 20px; color: #666;">已选中 0 个用户</span>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th id="checkboxHeader" style="display: none; width: 50px;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllUsers()"></th>
+                            <th>用户名</th>
+                            <th>姓名</th>
+                            <th>考号</th>
+                            <th>学校</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- 用户数据将通过JavaScript加载 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 邀请码管理 -->
+            <div id="inviteCodes" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">邀请码管理</h2>
+                    <div>
+                        <button class="btn" onclick="showAddInviteCodeModal()">添加邀请码</button>
+                        <button class="btn warning" onclick="toggleInviteCodeBatchMode()" id="inviteCodeBatchToggleBtn">批量操作</button>
+                    </div>
+                </div>
+                
+                <div id="inviteCodeBatchActions" class="batch-actions" style="display: none; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn" onclick="selectAllInviteCodes()">全选</button>
+                        <button class="btn" onclick="deselectAllInviteCodes()">取消全选</button>
+                        <button class="btn danger" onclick="batchDeleteInviteCodes()">批量删除</button>
+                        <button class="btn" onclick="batchGenerateInviteCodes()">批量生成</button>
+                        <span id="selectedInviteCodeCount" style="margin-left: 20px; color: #666;">已选中 0 个邀请码</span>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="inviteCodesTable">
+                    <thead>
+                        <tr>
+                            <th id="inviteCodeCheckboxHeader" style="display: none; width: 50px;"><input type="checkbox" id="selectAllInviteCodeCheckbox" onchange="toggleAllInviteCodes()"></th>
+                            <th>邀请码</th>
+                            <th>状态</th>
+                            <th>使用者</th>
+                            <th>创建时间</th>
+                            <th>使用时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inviteCodesTableBody">
+                        <!-- 邀请码数据将通过JavaScript加载 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 公告管理 -->
+            <div id="announcements" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">公告管理</h2>
+                    <div>
+                        <button class="btn" onclick="showAddAnnouncementModal()">发布公告</button>
+                        <button class="btn warning" onclick="toggleAnnouncementBatchMode()" id="announcementBatchToggleBtn">批量操作</button>
+                    </div>
+                </div>
+                
+                <div id="announcementBatchActions" class="batch-actions" style="display: none; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn" onclick="selectAllAnnouncements()">全选</button>
+                        <button class="btn" onclick="deselectAllAnnouncements()">取消全选</button>
+                        <button class="btn success" onclick="batchPublishAnnouncements()">批量发布</button>
+                        <button class="btn warning" onclick="batchUnpublishAnnouncements()">批量撤回</button>
+                        <button class="btn danger" onclick="batchDeleteAnnouncements()">批量删除</button>
+                        <span id="selectedAnnouncementCount" style="margin-left: 20px; color: #666;">已选中 0 个公告</span>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="announcementsTable">
+                    <thead>
+                        <tr>
+                            <th id="announcementCheckboxHeader" style="display: none; width: 50px;"><input type="checkbox" id="selectAllAnnouncementCheckbox" onchange="toggleAllAnnouncements()"></th>
+                            <th>标题</th>
+                            <th>类型</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>发布时间</th>
+                            <th>浏览次数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="announcementsTableBody">
+                        <!-- 公告数据将通过JavaScript加载 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 封号设备管理 -->
+            <div id="bannedDevices" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">封号设备管理</h2>
+                    <div>
+                        <button class="btn warning" onclick="toggleDeviceBatchMode()" id="deviceBatchToggleBtn">批量操作</button>
+                        <button class="btn" onclick="createTestDeviceData()">创建测试数据</button>
+                        <button class="btn" onclick="refreshBannedDevices()">刷新列表</button>
+                    </div>
+                </div>
+                
+                <div id="deviceBatchActions" class="batch-actions" style="display: none; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn" onclick="selectAllDevices()">全选</button>
+                        <button class="btn" onclick="deselectAllDevices()">取消全选</button>
+                        <button class="btn success" onclick="batchUnbanDevices()">批量解封</button>
+                        <button class="btn warning" onclick="batchExtendDeviceBan()">批量延长时间</button>
+                        <button class="btn danger" onclick="batchDeleteDeviceRestrictions()">批量删除</button>
+                        <span id="selectedDeviceCount" style="margin-left: 20px; color: #666;">已选中 0 个设备</span>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="bannedDevicesTable">
+                    <thead>
+                        <tr>
+                            <th id="deviceCheckboxHeader" style="display: none; width: 50px;"><input type="checkbox" id="selectAllDeviceCheckbox" onchange="toggleAllDevices()"></th>
+                            <th>设备指纹</th>
+                            <th>错误次数</th>
+                            <th>限制级别</th>
+                            <th>限制类型</th>
+                            <th>剩余时间</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bannedDevicesTableBody">
+                        <!-- 设备数据将通过JavaScript加载 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 统计信息 -->
+            <div id="statistics" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">统计信息</h2>
+                </div>
+                
+                <div id="statsContent">
+                    <!-- 统计内容将通过JavaScript加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加用户模态框 -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addUserModal')">&times;</span>
+            <h3>添加用户</h3>
+            <form id="addUserForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="newUsername">用户名</label>
+                        <input type="text" id="newUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">密码</label>
+                        <input type="password" id="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newName">姓名</label>
+                        <input type="text" id="newName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newExamNumber">考号</label>
+                        <input type="text" id="newExamNumber" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newSchool">学校</label>
+                    <input type="text" id="newSchool" required>
+                </div>
+                <button type="submit" class="btn">添加用户</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 封号模态框 -->
+    <div id="banUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('banUserModal')">&times;</span>
+            <h3>封号用户</h3>
+            <form id="banUserForm">
+                <div class="form-group">
+                    <label for="banReason">封号理由</label>
+                    <textarea id="banReason" rows="4" placeholder="请输入封号理由..." required></textarea>
+                </div>
+                <button type="submit" class="btn danger">确认封号</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 添加邀请码模态框 -->
+    <div id="addInviteCodeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addInviteCodeModal')">&times;</span>
+            <h3>添加邀请码</h3>
+            <form id="addInviteCodeForm">
+                <div class="form-group">
+                    <label>添加方式</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="addMethod" value="manual" checked onchange="toggleAddMethod('manual')"> 手动输入
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="addMethod" value="file" onchange="toggleAddMethod('file')"> 文件导入
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 手动输入部分 -->
+                <div id="manualInputSection">
+                    <div class="form-group">
+                        <label for="newInviteCode">邀请码</label>
+                        <input type="text" id="newInviteCode" placeholder="留空自动生成">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="inviteCodeCount">生成数量</label>
+                            <input type="number" id="inviteCodeCount" min="1" max="100" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="codeDigits">邀请码位数</label>
+                            <input type="number" id="codeDigits" min="4" max="16" value="8">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文件导入部分 -->
+                <div id="fileInputSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="inviteCodeFile">导入邀请码文件 (CSV/文本)</label>
+                        <input type="file" id="inviteCodeFile" accept=".csv,.txt,.xlsx,.xls" onchange="handleFileSelect(event)">
+                    </div>
+                    <div class="form-group" id="inviteCodePreview" style="display: none;">
+                        <label>预览邀请码</label>
+                        <div id="inviteCodeList" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; background: #f9f9f9;"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="validDays">有效天数（从用户登录时开始计算）</label>
+                    <input type="number" id="validDays" min="1" max="3650" value="30" placeholder="请输入有效天数">
+                    <small style="color: #666; display: block; margin-top: 5px;">从用户创建账号开始计算的有效天数</small>
+                </div>
+                <div class="form-group">
+                    <label for="maxUses">可创建用户次数</label>
+                    <input type="number" id="maxUses" min="1" max="100" value="1">
+                </div>
+                <button type="submit" class="btn">添加邀请码</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加公告模态框 -->
+    <div id="addAnnouncementModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" onclick="closeModal('addAnnouncementModal')">&times;</span>
+            <h3>发布公告</h3>
+            <form id="addAnnouncementForm">
+                <div class="form-group">
+                    <label for="announcementTitle">公告标题</label>
+                    <input type="text" id="announcementTitle" placeholder="请输入公告标题..." required>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="announcementType">公告类型</label>
+                        <select id="announcementType" required>
+                            <option value="info">信息通知</option>
+                            <option value="warning">重要提醒</option>
+                            <option value="urgent">紧急通知</option>
+                            <option value="maintenance">系统维护</option>
+                            <option value="update">版本更新</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="announcementStatus">发布状态</label>
+                        <select id="announcementStatus" required>
+                            <option value="draft">草稿（不发布）</option>
+                            <option value="published">立即发布</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="announcementContent">公告内容</label>
+                    <textarea id="announcementContent" rows="6" placeholder="请输入公告内容..." required></textarea>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="announcementPriority">优先级</label>
+                        <select id="announcementPriority">
+                            <option value="1">低</option>
+                            <option value="2" selected>中</option>
+                            <option value="3">高</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="announcementDuration">显示时间（天）</label>
+                        <input type="number" id="announcementDuration" min="1" max="365" value="7" placeholder="自动隐藏天数">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="announcementSticky"> 置顶显示
+                    </label>
+                    <small style="color: #666; display: block; margin-top: 5px;">置顶的公告将优先显示在用户端顶部</small>
+                </div>
+                
+                <button type="submit" class="btn">发布公告</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 编辑公告模态框 -->
+    <div id="editAnnouncementModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" onclick="closeModal('editAnnouncementModal')">&times;</span>
+            <h3>编辑公告</h3>
+            <form id="editAnnouncementForm">
+                <input type="hidden" id="editAnnouncementId">
+                
+                <div class="form-group">
+                    <label for="editAnnouncementTitle">公告标题</label>
+                    <input type="text" id="editAnnouncementTitle" required>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editAnnouncementType">公告类型</label>
+                        <select id="editAnnouncementType" required>
+                            <option value="info">信息通知</option>
+                            <option value="warning">重要提醒</option>
+                            <option value="urgent">紧急通知</option>
+                            <option value="maintenance">系统维护</option>
+                            <option value="update">版本更新</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editAnnouncementStatus">发布状态</label>
+                        <select id="editAnnouncementStatus" required>
+                            <option value="draft">草稿</option>
+                            <option value="published">已发布</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAnnouncementContent">公告内容</label>
+                    <textarea id="editAnnouncementContent" rows="6" required></textarea>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editAnnouncementPriority">优先级</label>
+                        <select id="editAnnouncementPriority">
+                            <option value="1">低</option>
+                            <option value="2">中</option>
+                            <option value="3">高</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editAnnouncementDuration">显示时间（天）</label>
+                        <input type="number" id="editAnnouncementDuration" min="1" max="365">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="editAnnouncementSticky"> 置顶显示
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量发布公告模态框 -->
+    <div id="batchPublishAnnouncementModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('batchPublishAnnouncementModal')">&times;</span>
+            <h3>批量发布公告</h3>
+            <p>确认要将选中的 <span id="batchPublishCount">0</span> 个公告设置为已发布状态吗？</p>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn" onclick="closeModal('batchPublishAnnouncementModal')">取消</button>
+                <button class="btn success" onclick="confirmBatchPublishAnnouncements()">确认发布</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量撤回公告模态框 -->
+    <div id="batchUnpublishAnnouncementModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('batchUnpublishAnnouncementModal')">&times;</span>
+            <h3>批量撤回公告</h3>
+            <p>确认要将选中的 <span id="batchUnpublishCount">0</span> 个公告设置为草稿状态吗？</p>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn" onclick="closeModal('batchUnpublishAnnouncementModal')">取消</button>
+                <button class="btn warning" onclick="confirmBatchUnpublishAnnouncements()">确认撤回</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 公告详情模态框 -->
+    <div id="viewAnnouncementModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" onclick="closeModal('viewAnnouncementModal')">&times;</span>
+            <h3 id="viewAnnouncementTitle">公告标题</h3>
+            <div id="viewAnnouncementDetails" style="margin: 20px 0;">
+                <!-- 公告详情将动态加载 -->
+            </div>
+            <div id="viewAnnouncementContent" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; line-height: 1.6;">
+                <!-- 公告内容将动态加载 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量生成邀请码模态框 -->
+    <div id="batchGenerateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('batchGenerateModal')">&times;</span>
+            <h3>批量生成邀请码</h3>
+            <form id="batchGenerateForm">
+                <div class="form-group">
+                    <label for="batchCount">生成数量</label>
+                    <input type="number" id="batchCount" min="1" max="1000" value="10" required>
+                </div>
+                <div class="form-group">
+                    <label for="codePrefix">邀请码前缀</label>
+                    <input type="text" id="codePrefix" placeholder="留空为随机生成" maxlength="4">
+                </div>
+                <button type="submit" class="btn">生成邀请码</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 设备解封模态框 -->
+    <div id="unbanDeviceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('unbanDeviceModal')">&times;</span>
+            <h3>设备解封</h3>
+            <div id="unbanDeviceInfo" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;"></div>
+            <div style="text-align: right;">
+                <button class="btn" onclick="closeModal('unbanDeviceModal')">取消</button>
+                <button class="btn success" onclick="confirmUnbanDevice()">确认解封</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设备延长限制模态框 -->
+    <div id="extendDeviceBanModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('extendDeviceBanModal')">&times;</span>
+            <h3>延长设备限制时间</h3>
+            <div id="extendDeviceInfo" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;"></div>
+            <div class="form-group">
+                <label for="extendType">延长类型</label>
+                <select id="extendType">
+                    <option value="minutes">分钟</option>
+                    <option value="hours">小时</option>
+                    <option value="days">天</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="extendDuration">延长时间</label>
+                <input type="number" id="extendDuration" min="1" value="10" required>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn" onclick="closeModal('extendDeviceBanModal')">取消</button>
+                <button class="btn warning" onclick="confirmExtendDeviceBan()">确认延长</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量延长设备限制模态框 -->
+    <div id="batchExtendDeviceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('batchExtendDeviceModal')">&times;</span>
+            <h3>批量延长设备限制时间</h3>
+            <div class="form-group">
+                <label for="batchExtendType">延长类型</label>
+                <select id="batchExtendType">
+                    <option value="minutes">分钟</option>
+                    <option value="hours">小时</option>
+                    <option value="days">天</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="batchExtendDuration">延长时间</label>
+                <input type="number" id="batchExtendDuration" min="1" value="10" required>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn" onclick="closeModal('batchExtendDeviceModal')">取消</button>
+                <button class="btn warning" onclick="confirmBatchExtendDevice()">确认批量延长</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentSection = 'dashboard';
+        let batchMode = false;
+        let inviteCodeBatchMode = false;
+        let selectedUsers = new Set();
+        let selectedInviteCodes = new Set();
+        let currentBanUser = '';
+        let syncInterval = null; // 用于定期同步的定时器
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            // 设置当前用户
+            const currentUser = localStorage.getItem('adminUser');
+            if (currentUser) {
+                document.getElementById('currentAdmin').textContent = currentUser;
+            }
+            
+            // 显示仪表板
+            showSection('dashboard');
+            loadStatistics();
+            
+            // 注册数据同步回调
+            dataSync.registerCallback('admin', function(data) {
+                // 只有在数据真正发生变化时才重新加载
+                console.log('接收到数据同步通知');
+                
+                // 根据当前显示的区域同步相应数据
+                switch(currentSection) {
+                    case 'users':
+                        loadUsers();
+                        break;
+                    case 'inviteCodes':
+                        loadInviteCodes();
+                        break;
+                    case 'dashboard':
+                        loadStatistics();
+                        break;
+                }
+            });
+        });
+        
+        // 切换显示区域
+        function showSection(section) {
+            currentSection = section;
+            
+            // 隐藏所有区域
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 移除所有菜单活跃状态
+            document.querySelectorAll('.sidebar-menu a').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 显示选中区域
+            document.getElementById(section).classList.add('active');
+            
+            // 设置菜单活跃状态
+            event.target.classList.add('active');
+            
+            // 加载相关数据
+            if (section === 'users') {
+                loadUsers();
+            } else if (section === 'inviteCodes') {
+                loadInviteCodes();
+            } else if (section === 'bannedDevices') {
+                loadBannedDevices();
+            } else if (section === 'announcements') {
+                loadAnnouncements();
+            } else if (section === 'dashboard') {
+                loadStatistics();
+            }
+        }
+        
+        // 加载用户列表
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+            const tbody = document.getElementById('usersTableBody');
+            
+            let html = '';
+            for (const [username, userInfo] of Object.entries(users)) {
+                const isBanned = bannedUsers[username];
+                const status = isBanned ? 'banned' : 'active';
+                const statusText = isBanned ? '已封号' : '正常';
+                const createTime = userInfo.createdAt ? new Date(userInfo.createdAt).toLocaleDateString() : '未知';
+                
+                const checkboxCell = batchMode ? `<td><input type="checkbox" value="${username}" onchange="toggleUserSelection('${username}')"></td>` : '';
+                
+                html += `
+                    <tr>
+                        ${checkboxCell}
+                        <td>${username}</td>
+                        <td>${userInfo.name || '未设置'}</td>
+                        <td>${userInfo.examNumber || '未设置'}</td>
+                        <td>${userInfo.school || '未设置'}</td>
+                        <td><span class="status-badge status-${status}">${statusText}</span></td>
+                        <td>${createTime}</td>
+                        <td>
+                            ${!isBanned ? `<button class="btn danger" onclick="banUser('${username}')">封号</button>` : 
+                                         `<button class="btn success" onclick="unbanUser('${username}')">解封</button>`}
+                            <button class="btn danger" onclick="deleteUser('${username}')">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            const colspan = batchMode ? '8' : '7';
+            tbody.innerHTML = html || `<tr><td colspan="${colspan}" style="text-align: center;">暂无用户</td></tr>`;
+            updateSelectedCount();
+        }
+        
+        // 加载邀请码列表
+        function loadInviteCodes() {
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            const tbody = document.getElementById('inviteCodesTableBody');
+            
+            let html = '';
+            for (const [code, codeInfo] of Object.entries(inviteCodes)) {
+                const status = codeInfo.used ? 'used' : 'unused';
+                const statusText = codeInfo.used ? '已使用' : '未使用';
+                const usedBy = codeInfo.usedBy || '无';
+                const createTime = codeInfo.createdAt ? new Date(codeInfo.createdAt).toLocaleDateString() : '未知';
+                const usedTime = codeInfo.usedTime ? new Date(codeInfo.usedTime).toLocaleDateString() : '无';
+                
+                const checkboxCell = inviteCodeBatchMode ? `<td><input type="checkbox" value="${code}" onchange="toggleInviteCodeSelection('${code}')"></td>` : '';
+                
+                html += `
+                    <tr>
+                        ${checkboxCell}
+                        <td>${code}</td>
+                        <td><span class="status-badge status-${status}">${statusText}</span></td>
+                        <td>${usedBy}</td>
+                        <td>${createTime}</td>
+                        <td>${usedTime}</td>
+                        <td>
+                            <button class="btn danger" onclick="deleteInviteCode('${code}')">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            const colspan = inviteCodeBatchMode ? '7' : '6';
+            tbody.innerHTML = html || `<tr><td colspan="${colspan}" style="text-align: center;">暂无邀请码</td></tr>`;
+            updateSelectedInviteCodeCount();
+        }
+        
+        // 加载统计信息
+        function loadStatistics() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            
+            const totalUsers = Object.keys(users).length;
+            const bannedCount = Object.keys(bannedUsers).length;
+            const activeUsers = totalUsers - bannedCount;
+            
+            const totalInviteCodes = Object.keys(inviteCodes).length;
+            const usedInviteCodes = Object.values(inviteCodes).filter(code => code.used).length;
+            const unusedInviteCodes = totalInviteCodes - usedInviteCodes;
+            
+            const totalAnnouncements = announcements.length;
+            const publishedAnnouncements = announcements.filter(ann => ann.status === 'published').length;
+            const draftAnnouncements = totalAnnouncements - publishedAnnouncements;
+            const totalViews = announcements.reduce((sum, ann) => sum + (ann.views || 0), 0);
+            
+            const statsContent = document.getElementById('statsContent');
+            statsContent.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h3 style="color: #667eea; margin-bottom: 10px;">用户统计</h3>
+                        <p>总用户数: <strong>${totalUsers}</strong></p>
+                        <p>活跃用户: <strong>${activeUsers}</strong></p>
+                        <p>封禁用户: <strong>${bannedCount}</strong></p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h3 style="color: #28a745; margin-bottom: 10px;">邀请码统计</h3>
+                        <p>总邀请码: <strong>${totalInviteCodes}</strong></p>
+                        <p>已使用: <strong>${usedInviteCodes}</strong></p>
+                        <p>未使用: <strong>${unusedInviteCodes}</strong></p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h3 style="color: #ff6b6b; margin-bottom: 10px;">公告统计</h3>
+                        <p>总公告数: <strong>${totalAnnouncements}</strong></p>
+                        <p>已发布: <strong>${publishedAnnouncements}</strong></p>
+                        <p>草稿: <strong>${draftAnnouncements}</strong></p>
+                        <p>总浏览量: <strong>${totalViews}</strong></p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h3 style="color: #ffc107; margin-bottom: 10px;">使用率</h3>
+                        <p>邀请码使用率: <strong>${totalInviteCodes > 0 ? ((usedInviteCodes / totalInviteCodes) * 100).toFixed(1) : 0}%</strong></p>
+                        <p>用户封禁率: <strong>${totalUsers > 0 ? ((bannedCount / totalUsers) * 100).toFixed(1) : 0}%</strong></p>
+                        <p>公告发布率: <strong>${totalAnnouncements > 0 ? ((publishedAnnouncements / totalAnnouncements) * 100).toFixed(1) : 0}%</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 显示添加用户模态框
+        function showAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'block';
+        }
+        
+        // 显示添加邀请码模态框
+        function showAddInviteCodeModal() {
+            document.getElementById('addInviteCodeModal').style.display = 'block';
+        }
+        
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 封号用户
+        function banUser(username) {
+            currentBanUser = username;
+            document.getElementById('banUserModal').style.display = 'block';
+        }
+        
+        // 解封用户
+        function unbanUser(username) {
+            if (confirm(`确定要解封用户 ${username} 吗？`)) {
+                const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+                delete bannedUsers[username];
+                localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+                
+                showMessage('用户解封成功！', 'success');
+                loadUsers();
+                loadStatistics();
+            }
+        }
+        
+        // 删除用户
+        function deleteUser(username) {
+            if (confirm(`确定要删除用户 ${username} 吗？此操作不可恢复！`)) {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+                
+                delete users[username];
+                delete bannedUsers[username];
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+                
+                showMessage('用户删除成功！', 'success');
+                loadUsers();
+                loadStatistics();
+            }
+        }
+        
+        // 删除邀请码
+        function deleteInviteCode(code) {
+            if (confirm(`确定要删除邀请码 ${code} 吗？`)) {
+                const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+                delete inviteCodes[code];
+                localStorage.setItem('inviteCodes', JSON.stringify(inviteCodes));
+                
+                showMessage('邀请码删除成功！', 'success');
+                loadInviteCodes();
+                loadStatistics();
+            }
+        }
+        
+        // 生成随机邀请码
+        function generateInviteCode(digits = 8) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < digits; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        // 添加用户表单提交
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            const name = document.getElementById('newName').value;
+            const examNumber = document.getElementById('newExamNumber').value;
+            const school = document.getElementById('newSchool').value;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[username]) {
+                showMessage('用户名已存在！', 'error');
+                return;
+            }
+            
+            users[username] = {
+                password: password,
+                name: name,
+                examNumber: examNumber,
+                school: school,
+                grades: [],
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showMessage('用户添加成功！', 'success');
+            closeModal('addUserModal');
+            loadUsers();
+            loadStatistics();
+            
+            // 清空表单
+            this.reset();
+        });
+        
+        // 封号表单提交
+        document.getElementById('banUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reason = document.getElementById('banReason').value;
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+            
+            bannedUsers[currentBanUser] = reason;
+            localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+            
+            showMessage(`用户 ${currentBanUser} 封号成功！`, 'success');
+            closeModal('banUserModal');
+            loadUsers();
+            loadStatistics();
+            
+            // 清空表单
+            this.reset();
+            currentBanUser = '';
+        });
+        
+        // 切换添加方式
+        function toggleAddMethod(method) {
+            if (method === 'manual') {
+                document.getElementById('manualInputSection').style.display = 'block';
+                document.getElementById('fileInputSection').style.display = 'none';
+                document.getElementById('inviteCodePreview').style.display = 'none';
+                // 清空文件输入
+                document.getElementById('inviteCodeFile').value = '';
+            } else {
+                document.getElementById('manualInputSection').style.display = 'none';
+                document.getElementById('fileInputSection').style.display = 'block';
+            }
+        }
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                let codes = [];
+                
+                // 根据文件类型解析内容
+                if (file.name.endsWith('.csv')) {
+                    codes = parseCSV(content);
+                } else {
+                    codes = content.split(/\r?\n/).filter(line => line.trim() !== '');
+                }
+                
+                // 显示预览
+                showInviteCodePreview(codes);
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // 解析CSV内容
+        function parseCSV(content) {
+            const lines = content.split(/\r?\n/);
+            const codes = [];
+            
+            for (let line of lines) {
+                if (line.trim() === '') continue;
+                // 简单处理，假设每行只有一个邀请码
+                const fields = line.split(',');
+                if (fields.length > 0 && fields[0].trim() !== '') {
+                    codes.push(fields[0].trim());
+                }
+            }
+            
+            return codes;
+        }
+
+        // 显示邀请码预览
+        function showInviteCodePreview(codes) {
+            const previewDiv = document.getElementById('inviteCodePreview');
+            const listDiv = document.getElementById('inviteCodeList');
+            
+            if (codes.length > 0) {
+                listDiv.innerHTML = '<ul style="list-style-type: none; padding: 0; margin: 0;">' + 
+                    codes.map(code => `<li style="padding: 2px 0; border-bottom: 1px solid #eee;">${code}</li>`).join('') + 
+                    '</ul>' +
+                    `<p style="margin-top: 10px; font-weight: bold;">共 ${codes.length} 个邀请码</p>`;
+                previewDiv.style.display = 'block';
+            } else {
+                previewDiv.style.display = 'none';
+            }
+        }
+
+        // 修改添加邀请码表单提交处理
+        document.getElementById('addInviteCodeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const addMethod = document.querySelector('input[name="addMethod"]:checked').value;
+            const validDays = parseInt(document.getElementById('validDays').value);
+            const maxUses = parseInt(document.getElementById('maxUses').value) || 1;
+            
+            // 验证有效天数输入
+            if (isNaN(validDays) || validDays < 1 || validDays > 3650) {
+                showMessage('有效天数必须是1-3650之间的整数！', 'error');
+                return;
+            }
+            
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            let addedCount = 0;
+            let duplicateCount = 0;
+            
+            if (addMethod === 'file') {
+                // 文件导入方式
+                const fileInput = document.getElementById('inviteCodeFile');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    showMessage('请选择要导入的文件！', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    let codes = [];
+                    
+                    // 根据文件类型解析内容
+                    if (file.name.endsWith('.csv')) {
+                        codes = parseCSV(content);
+                    } else {
+                        codes = content.split(/\r?\n/).filter(line => line.trim() !== '');
+                    }
+                    
+                    // 添加导入的邀请码
+                    for (let code of codes) {
+                        if (inviteCodes[code]) {
+                            duplicateCount++;
+                        } else {
+                            inviteCodes[code] = {
+                                used: false,
+                                usedCount: 0,
+                                maxUses: maxUses,
+                                createdAt: new Date().toISOString(),
+                                validDays: validDays,
+                                expiresAt: new Date(Date.now() + validDays * 24 * 60 * 60 * 1000).toISOString()
+                            };
+                            addedCount++;
+                        }
+                    }
+                    
+                    localStorage.setItem('inviteCodes', JSON.stringify(inviteCodes));
+                    
+                    if (duplicateCount > 0) {
+                        showMessage(`成功添加 ${addedCount} 个邀请码，跳过 ${duplicateCount} 个重复邀请码！`, 'success');
+                    } else {
+                        showMessage(`成功添加 ${addedCount} 个邀请码！`, 'success');
+                    }
+                    
+                    closeModal('addInviteCodeModal');
+                    loadInviteCodes();
+                    loadStatistics();
+                    
+                    // 清空表单
+                    document.getElementById('addInviteCodeForm').reset();
+                    document.getElementById('inviteCodePreview').style.display = 'none';
+                    fileInput.value = '';
+                    // 重置为手动输入方式
+                    toggleAddMethod('manual');
+                    // 设置默认有效天数
+                    document.getElementById('validDays').value = '30';
+                };
+                
+                reader.readAsText(file, 'UTF-8');
+            } else {
+                // 手动输入方式
+                const customCode = document.getElementById('newInviteCode').value;
+                const count = parseInt(document.getElementById('inviteCodeCount').value) || 1;
+                const digits = parseInt(document.getElementById('codeDigits').value) || 8;
+                
+                for (let i = 0; i < count; i++) {
+                    let code = customCode || generateInviteCode(digits);
+                    
+                    // 如果是自定义邀请码且数量大于1，添加序号
+                    if (customCode && count > 1) {
+                        code = customCode + (i + 1);
+                    }
+                    
+                    // 确保邀请码不重复
+                    while (inviteCodes[code]) {
+                        code = generateInviteCode(digits);
+                    }
+                    
+                    inviteCodes[code] = {
+                        used: false,
+                        usedCount: 0,
+                        maxUses: maxUses,
+                        createdAt: new Date().toISOString(),
+                        validDays: validDays,
+                        expiresAt: new Date(Date.now() + validDays * 24 * 60 * 60 * 1000).toISOString()
+                    };
+                    
+                    addedCount++;
+                }
+                
+                localStorage.setItem('inviteCodes', JSON.stringify(inviteCodes));
+                
+                showMessage(`成功添加 ${addedCount} 个邀请码！`, 'success');
+                closeModal('addInviteCodeModal');
+                loadInviteCodes();
+                loadStatistics();
+                
+                // 清空表单
+                this.reset();
+                // 重置为手动输入方式
+                toggleAddMethod('manual');
+                // 设置默认有效天数
+                document.getElementById('validDays').value = '30';
+            }
+        });
+        
+        // 批量操作功能
+        function toggleBatchMode() {
+            batchMode = !batchMode;
+            const batchActions = document.getElementById('batchActions');
+            const checkboxHeader = document.getElementById('checkboxHeader');
+            const toggleBtn = document.getElementById('batchToggleBtn');
+            
+            if (batchMode) {
+                batchActions.style.display = 'block';
+                checkboxHeader.style.display = 'table-cell';
+                toggleBtn.textContent = '退出批量';
+                toggleBtn.classList.add('danger');
+            } else {
+                batchActions.style.display = 'none';
+                checkboxHeader.style.display = 'none';
+                toggleBtn.textContent = '批量操作';
+                toggleBtn.classList.remove('danger');
+                selectedUsers.clear();
+            }
+            
+            loadUsers();
+        }
+        
+        function toggleInviteCodeBatchMode() {
+            inviteCodeBatchMode = !inviteCodeBatchMode;
+            const batchActions = document.getElementById('inviteCodeBatchActions');
+            const checkboxHeader = document.getElementById('inviteCodeCheckboxHeader');
+            const toggleBtn = document.getElementById('inviteCodeBatchToggleBtn');
+            
+            if (inviteCodeBatchMode) {
+                batchActions.style.display = 'block';
+                checkboxHeader.style.display = 'table-cell';
+                toggleBtn.textContent = '退出批量';
+                toggleBtn.classList.add('danger');
+            } else {
+                batchActions.style.display = 'none';
+                checkboxHeader.style.display = 'none';
+                toggleBtn.textContent = '批量操作';
+                toggleBtn.classList.remove('danger');
+                selectedInviteCodes.clear();
+            }
+            
+            loadInviteCodes();
+        }
+        
+        function toggleUserSelection(username) {
+            if (selectedUsers.has(username)) {
+                selectedUsers.delete(username);
+            } else {
+                selectedUsers.add(username);
+            }
+            updateSelectedCount();
+        }
+        
+        function toggleInviteCodeSelection(code) {
+            if (selectedInviteCodes.has(code)) {
+                selectedInviteCodes.delete(code);
+            } else {
+                selectedInviteCodes.add(code);
+            }
+            updateSelectedInviteCodeCount();
+        }
+        
+        function toggleAllUsers() {
+            const checkboxes = document.querySelectorAll('#usersTableBody input[type="checkbox"]');
+            const selectAll = document.getElementById('selectAllCheckbox').checked;
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll;
+                if (selectAll) {
+                    selectedUsers.add(checkbox.value);
+                } else {
+                    selectedUsers.delete(checkbox.value);
+                }
+            });
+            
+            updateSelectedCount();
+        }
+        
+        function toggleAllInviteCodes() {
+            const checkboxes = document.querySelectorAll('#inviteCodesTableBody input[type="checkbox"]');
+            const selectAll = document.getElementById('selectAllInviteCodeCheckbox').checked;
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll;
+                if (selectAll) {
+                    selectedInviteCodes.add(checkbox.value);
+                } else {
+                    selectedInviteCodes.delete(checkbox.value);
+                }
+            });
+            
+            updateSelectedInviteCodeCount();
+        }
+        
+        function selectAllUsers() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            selectedUsers = new Set(Object.keys(users));
+            document.getElementById('selectAllCheckbox').checked = true;
+            document.querySelectorAll('#usersTableBody input[type="checkbox"]').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        function deselectAllUsers() {
+            selectedUsers.clear();
+            document.getElementById('selectAllCheckbox').checked = false;
+            document.querySelectorAll('#usersTableBody input[type="checkbox"]').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        function selectAllInviteCodes() {
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            selectedInviteCodes = new Set(Object.keys(inviteCodes));
+            document.getElementById('selectAllInviteCodeCheckbox').checked = true;
+            document.querySelectorAll('#inviteCodesTableBody input[type="checkbox"]').forEach(cb => cb.checked = true);
+            updateSelectedInviteCodeCount();
+        }
+        
+        function deselectAllInviteCodes() {
+            selectedInviteCodes.clear();
+            document.getElementById('selectAllInviteCodeCheckbox').checked = false;
+            document.querySelectorAll('#inviteCodesTableBody input[type="checkbox"]').forEach(cb => cb.checked = false);
+            updateSelectedInviteCodeCount();
+        }
+        
+        function updateSelectedCount() {
+            const countElement = document.getElementById('selectedCount');
+            if (countElement) {
+                countElement.textContent = `已选中 ${selectedUsers.size} 个用户`;
+            }
+        }
+        
+        function updateSelectedInviteCodeCount() {
+            const countElement = document.getElementById('selectedInviteCodeCount');
+            if (countElement) {
+                countElement.textContent = `已选中 ${selectedInviteCodes.size} 个邀请码`;
+            }
+        }
+        
+        function batchBanUsers() {
+            if (selectedUsers.size === 0) {
+                showMessage('请先选择要封号的用户！', 'error');
+                return;
+            }
+            
+            const reason = prompt('请输入封号理由：');
+            if (!reason) return;
+            
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+            selectedUsers.forEach(username => {
+                bannedUsers[username] = reason;
+            });
+            
+            localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+            showMessage(`成功封号 ${selectedUsers.size} 个用户！`, 'success');
+            selectedUsers.clear();
+            loadUsers();
+            loadStatistics();
+        }
+        
+        function batchUnbanUsers() {
+            if (selectedUsers.size === 0) {
+                showMessage('请先选择要解封的用户！', 'error');
+                return;
+            }
+            
+            if (!confirm(`确定要解封选中的 ${selectedUsers.size} 个用户吗？`)) return;
+            
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+            selectedUsers.forEach(username => {
+                delete bannedUsers[username];
+            });
+            
+            localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+            showMessage(`成功解封 ${selectedUsers.size} 个用户！`, 'success');
+            selectedUsers.clear();
+            loadUsers();
+            loadStatistics();
+        }
+        
+        function batchDeleteUsers() {
+            if (selectedUsers.size === 0) {
+                showMessage('请先选择要删除的用户！', 'error');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${selectedUsers.size} 个用户吗？此操作不可恢复！`)) return;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+            
+            selectedUsers.forEach(username => {
+                delete users[username];
+                delete bannedUsers[username];
+            });
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+            
+            showMessage(`成功删除 ${selectedUsers.size} 个用户！`, 'success');
+            selectedUsers.clear();
+            loadUsers();
+            loadStatistics();
+        }
+        
+        function batchDeleteInviteCodes() {
+            if (selectedInviteCodes.size === 0) {
+                showMessage('请先选择要删除的邀请码！', 'error');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${selectedInviteCodes.size} 个邀请码吗？`)) return;
+            
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            
+            selectedInviteCodes.forEach(code => {
+                delete inviteCodes[code];
+            });
+            localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+            showMessage(`成功解封 ${selectedUsers.size} 个用户！`, 'success');
+            selectedUsers.clear();
+            loadUsers();
+            loadStatistics();
+        }
+        
+        function batchDeleteUsers() {
+            if (selectedUsers.size === 0) {
+                showMessage('请先选择要删除的用户！', 'error');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${selectedUsers.size} 个用户吗？此操作不可恢复！`)) return;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '{}');
+            
+            selectedUsers.forEach(username => {
+                delete users[username];
+                delete bannedUsers[username];
+            });
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+            showMessage(`成功删除 ${selectedUsers.size} 个用户！`, 'success');
+            selectedUsers.clear();
+            loadUsers();
+            loadStatistics();
+        }
+        
+        function batchDeleteInviteCodes() {
+            if (selectedInviteCodes.size === 0) {
+                showMessage('请先选择要删除的邀请码！', 'error');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${selectedInviteCodes.size} 个邀请码吗？`)) return;
+            
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            selectedInviteCodes.forEach(code => {
+                delete inviteCodes[code];
+            });
+            
+            localStorage.setItem('inviteCodes', JSON.stringify(inviteCodes));
+            showMessage(`成功删除 ${selectedInviteCodes.size} 个邀请码！`, 'success');
+            selectedInviteCodes.clear();
+            loadInviteCodes();
+            loadStatistics();
+        }
+        
+        function batchGenerateInviteCodes() {
+            document.getElementById('batchGenerateModal').style.display = 'block';
+        }
+        
+        // 批量生成邀请码表单提交
+        document.getElementById('batchGenerateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const count = parseInt(document.getElementById('batchCount').value) || 10;
+            const prefix = document.getElementById('codePrefix').value;
+            
+            const inviteCodes = JSON.parse(localStorage.getItem('inviteCodes') || '{}');
+            let addedCount = 0;
+            
+            for (let i = 0; i < count; i++) {
+                let code = prefix ? prefix + generateInviteCode().substring(0, 8 - prefix.length) : generateInviteCode();
+                
+                // 确保邀请码不重复
+                while (inviteCodes[code]) {
+                    code = prefix ? prefix + generateInviteCode().substring(0, 8 - prefix.length) : generateInviteCode();
+                }
+                
+                inviteCodes[code] = {
+                    used: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                addedCount++;
+            }
+            
+            localStorage.setItem('inviteCodes', JSON.stringify(inviteCodes));
+            
+            showMessage(`成功批量生成 ${addedCount} 个邀请码！`, 'success');
+            closeModal('batchGenerateModal');
+            loadInviteCodes();
+            loadStatistics();
+            
+            // 清空表单
+            this.reset();
+        });
+
+        // 设备管理相关函数
+        
+        // 加载封号设备列表
+        function loadBannedDevices() {
+            const bannedDevices = getAllBannedDevices();
+            const tbody = document.getElementById('bannedDevicesTableBody');
+            
+            let html = '';
+            
+            bannedDevices.forEach(device => {
+                const checkboxCell = deviceBatchMode ? `<td><input type="checkbox" value="${device.fingerprint}" onchange="toggleDeviceSelection('${device.fingerprint}')"></td>` : '';
+                
+                const restrictionTypeText = getRestrictionTypeText(device.restrictionLevel, device.restrictionEndTime);
+                const remainingTimeText = getRemainingTimeText(device.restrictionEndTime);
+                const createTimeText = new Date(device.timestamp).toLocaleString();
+                
+                html += `
+                    <tr>
+                        ${checkboxCell}
+                        <td>${device.fingerprint}</td>
+                        <td>${device.attempts}</td>
+                        <td>第${device.restrictionLevel}级</td>
+                        <td>${restrictionTypeText}</td>
+                        <td>${remainingTimeText}</td>
+                        <td>${createTimeText}</td>
+                        <td>
+                            ${device.restrictionLevel < 3 ? 
+                                `<button class="btn success" onclick="unbanDevice('${device.fingerprint}')"> 解封</button>
+                                 <button class="btn warning" onclick="extendDeviceBan('${device.fingerprint}')"> 延长</button>` : 
+                                `<button class="btn success" onclick="unbanDevice('${device.fingerprint}')"> 解封</button>`
+                            }
+                            <button class="btn danger" onclick="deleteDeviceRestriction('${device.fingerprint}')"> 删除</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            const colspan = deviceBatchMode ? '8' : '7';
+            tbody.innerHTML = html || `<tr><td colspan="${colspan}" style="text-align: center;">暂无封号设备</td></tr>`;
+            updateSelectedDeviceCount();
+        }
+        
+        // 获取所有封号设备
+        function getAllBannedDevices() {
+            const devices = [];
+            
+            // 遍历localStorage查找所有restriction_开头的记录
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('restriction_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && (data.attempts > 0 || data.level > 0)) {
+                            devices.push({
+                                fingerprint: data.deviceFingerprint || key.replace('restriction_', ''),
+                                attempts: data.attempts || 0,
+                                restrictionLevel: data.level || 0,
+                                restrictionEndTime: data.endTime || 0,
+                                timestamp: data.timestamp || Date.now()
+                            });
+                        }
+                    } catch (e) {
+                        console.error('解析设备数据错误:', e);
+                    }
+                }
+            }
+            
+            return devices.sort((a, b) => b.timestamp - a.timestamp);
+        }
+        
+        // 获取限制类型文本
+        function getRestrictionTypeText(level, endTime) {
+            if (level === 3) return '永久封禁';
+            if (level === 2) return '30分钟限制';
+            if (level === 1) return '10分钟限制';
+            if (endTime > Date.now()) return '临时限制';
+            return '无限制';
+        }
+        
+        // 获取剩余时间文本
+        function getRemainingTimeText(endTime) {
+            if (!endTime || endTime === 0) return '无';
+            
+            const now = Date.now();
+            const remaining = endTime - now;
+            
+            if (remaining <= 0) return '已过期';
+            
+            const minutes = Math.floor(remaining / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days}天${hours % 24}小时`;
+            if (hours > 0) return `${hours}小时${minutes % 60}分钟`;
+            return `${minutes}分钟`;
+        }
+        
+        // 设备批量操作切换
+        function toggleDeviceBatchMode() {
+            deviceBatchMode = !deviceBatchMode;
+            const batchActions = document.getElementById('deviceBatchActions');
+            const checkboxHeader = document.getElementById('deviceCheckboxHeader');
+            const toggleBtn = document.getElementById('deviceBatchToggleBtn');
+            
+            if (deviceBatchMode) {
+                batchActions.style.display = 'block';
+                checkboxHeader.style.display = 'table-cell';
+                toggleBtn.textContent = '退出批量';
+                toggleBtn.classList.add('danger');
+            } else {
+                batchActions.style.display = 'none';
+                checkboxHeader.style.display = 'none';
+                toggleBtn.textContent = '批量操作';
+                toggleBtn.classList.remove('danger');
+                selectedDevices.clear();
+            }
+            
+            loadBannedDevices();
+        }
+        
+        // 设备选择操作
+        function toggleDeviceSelection(fingerprint) {
+            if (selectedDevices.has(fingerprint)) {
+                selectedDevices.delete(fingerprint);
+            } else {
+                selectedDevices.add(fingerprint);
+            }
+            updateSelectedDeviceCount();
+        }
+        
+        function toggleAllDevices() {
+            const checkboxes = document.querySelectorAll('#bannedDevicesTableBody input[type="checkbox"]');
+            const selectAll = document.getElementById('selectAllDeviceCheckbox').checked;
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll;
+                if (selectAll) {
+                    selectedDevices.add(checkbox.value);
+                } else {
+                    selectedDevices.delete(checkbox.value);
+                }
+            });
+            
+            updateSelectedDeviceCount();
+        }
+        
+        function selectAllDevices() {
+            const devices = getAllBannedDevices();
+            selectedDevices = new Set(devices.map(d => d.fingerprint));
+            document.getElementById('selectAllDeviceCheckbox').checked = true;
+            document.querySelectorAll('#bannedDevicesTableBody input[type="checkbox"]').forEach(cb => cb.checked = true);
+            updateSelectedDeviceCount();
+        }
+        
+        function deselectAllDevices() {
+            selectedDevices.clear();
+            document.getElementById('selectAllDeviceCheckbox').checked = false;
+            document.querySelectorAll('#bannedDevicesTableBody input[type="checkbox"]').forEach(cb => cb.checked = false);
+            updateSelectedDeviceCount();
+        }
+        
+        function updateSelectedDeviceCount() {
+            const countElement = document.getElementById('selectedDeviceCount');
+            if (countElement) {
+                countElement.textContent = `已选中 ${selectedDevices.size} 个设备`;
+            }
+        }
+        
+        // 单个设备操作
+        function unbanDevice(fingerprint) {
+            currentDeviceFingerprint = fingerprint;
+            const deviceData = getDeviceData(fingerprint);
+            
+            document.getElementById('unbanDeviceInfo').innerHTML = `
+                <p><strong>设备指纹：</strong> ${fingerprint}</p>
+                <p><strong>错误次数：</strong> ${deviceData.attempts}</p>
+                <p><strong>限制级别：</strong> 第${deviceData.restrictionLevel}级</p>
+                <p><strong>当前状态：</strong> ${getRestrictionTypeText(deviceData.restrictionLevel, deviceData.restrictionEndTime)}</p>
+            `;
+            
+            document.getElementById('unbanDeviceModal').style.display = 'block';
+        }
+        
+        function extendDeviceBan(fingerprint) {
+            currentDeviceFingerprint = fingerprint;
+            const deviceData = getDeviceData(fingerprint);
+            
+            document.getElementById('extendDeviceInfo').innerHTML = `
+                <p><strong>设备指纹：</strong> ${fingerprint}</p>
+                <p><strong>当前限制：</strong> ${getRestrictionTypeText(deviceData.restrictionLevel, deviceData.restrictionEndTime)}</p>
+                <p><strong>剩余时间：</strong> ${getRemainingTimeText(deviceData.restrictionEndTime)}</p>
+            `;
+            
+            document.getElementById('extendDeviceBanModal').style.display = 'block';
+        }
+        
+        function deleteDeviceRestriction(fingerprint) {
+            if (confirm(`确认删除设备 ${fingerprint} 的限制记录？`)) {
+                localStorage.removeItem(`restriction_${fingerprint}`);
+                showMessage('设备限制记录已删除！', 'success');
+                loadBannedDevices();
+            }
+        }
+        
+        // 获取设备数据
+        function getDeviceData(fingerprint) {
+            try {
+                const data = JSON.parse(localStorage.getItem(`restriction_${fingerprint}`) || '{}');
+                return {
+                    attempts: data.attempts || 0,
+                    restrictionLevel: data.level || 0,
+                    restrictionEndTime: data.endTime || 0,
+                    timestamp: data.timestamp || Date.now()
+                };
+            } catch (e) {
+                return {
+                    attempts: 0,
+                    restrictionLevel: 0,
+                    restrictionEndTime: 0,
+                    timestamp: Date.now()
+                };
+            }
+        }
+        
+        // 确认解封设备
+        function confirmUnbanDevice() {
+            if (currentDeviceFingerprint) {
+                console.log(`正在解封设备: ${currentDeviceFingerprint}`);
+                
+                // 删除限制记录
+                localStorage.removeItem(`restriction_${currentDeviceFingerprint}`);
+                
+                // 验证是否成功删除
+                const checkData = localStorage.getItem(`restriction_${currentDeviceFingerprint}`);
+                if (checkData === null) {
+                    console.log(`设备 ${currentDeviceFingerprint} 限制记录已成功删除`);
+                    showMessage('设备解封成功！用户端将在几秒内感知到变化。', 'success');
+                } else {
+                    console.error(`设备 ${currentDeviceFingerprint} 限制记录删除失败`);
+                    showMessage('解封失败，请重试！', 'error');
+                }
+                
+                closeModal('unbanDeviceModal');
+                loadBannedDevices();
+                currentDeviceFingerprint = '';
+            }
+        }
+        
+        // 确认延长设备限制
+        function confirmExtendDeviceBan() {
+            const extendType = document.getElementById('extendType').value;
+            const duration = parseInt(document.getElementById('extendDuration').value);
+            
+            if (!duration || duration <= 0) {
+                showMessage('请输入有效的延长时间！', 'error');
+                return;
+            }
+            
+            let extendMs = 0;
+            switch(extendType) {
+                case 'minutes':
+                    extendMs = duration * 60 * 1000;
+                    break;
+                case 'hours':
+                    extendMs = duration * 60 * 60 * 1000;
+                    break;
+                case 'days':
+                    extendMs = duration * 24 * 60 * 60 * 1000;
+                    break;
+            }
+            
+            const deviceData = getDeviceData(currentDeviceFingerprint);
+            const now = Date.now();
+            const currentEndTime = deviceData.restrictionEndTime;
+            
+            // 如果当前时间大于原结束时间，从当前时间开始延长
+            // 否则从原结束时间开始延长
+            const newEndTime = Math.max(now, currentEndTime) + extendMs;
+            
+            console.log(`延长设备 ${currentDeviceFingerprint} 限制时间:`);
+            console.log(`原结束时间: ${new Date(currentEndTime).toLocaleString()}`);
+            console.log(`新结束时间: ${new Date(newEndTime).toLocaleString()}`);
+            
+            const newData = {
+                attempts: deviceData.attempts,
+                level: deviceData.restrictionLevel,
+                endTime: newEndTime,
+                deviceFingerprint: currentDeviceFingerprint,
+                timestamp: deviceData.timestamp
+            };
+            
+            localStorage.setItem(`restriction_${currentDeviceFingerprint}`, JSON.stringify(newData));
+            
+            // 验证更新是否成功
+            const updatedData = JSON.parse(localStorage.getItem(`restriction_${currentDeviceFingerprint}`));
+            if (updatedData && updatedData.endTime === newEndTime) {
+                console.log(`设备 ${currentDeviceFingerprint} 限制时间已成功更新`);
+                showMessage(`设备限制时间延长${duration}${extendType === 'minutes' ? '分钟' : extendType === 'hours' ? '小时' : '天'}成功！用户端将在几秒内感知到变化。`, 'success');
+            } else {
+                console.error(`设备 ${currentDeviceFingerprint} 限制时间更新失败`);
+                showMessage('延长失败，请重试！', 'error');
+            }
+            
+            closeModal('extendDeviceBanModal');
+            loadBannedDevices();
+            currentDeviceFingerprint = '';
+        }
+        
+        // 批量操作
+        function batchUnbanDevices() {
+            if (selectedDevices.size === 0) {
+                showMessage('请先选择要解封的设备！', 'error');
+                return;
+            }
+            
+            if (confirm(`确认解封选中的 ${selectedDevices.size} 个设备？`)) {
+                selectedDevices.forEach(fingerprint => {
+                    localStorage.removeItem(`restriction_${fingerprint}`);
+                });
+                
+                showMessage(`成功解封 ${selectedDevices.size} 个设备！`, 'success');
+                selectedDevices.clear();
+                loadBannedDevices();
+            }
+        }
+        
+        function batchExtendDeviceBan() {
+            if (selectedDevices.size === 0) {
+                showMessage('请先选择要延长的设备！', 'error');
+                return;
+            }
+            
+            document.getElementById('batchExtendDeviceModal').style.display = 'block';
+        }
+        
+        function confirmBatchExtendDevice() {
+            const extendType = document.getElementById('batchExtendType').value;
+            const duration = parseInt(document.getElementById('batchExtendDuration').value);
+            
+            if (!duration || duration <= 0) {
+                showMessage('请输入有效的延长时间！', 'error');
+                return;
+            }
+            
+            let extendMs = 0;
+            switch(extendType) {
+                case 'minutes':
+                    extendMs = duration * 60 * 1000;
+                    break;
+                case 'hours':
+                    extendMs = duration * 60 * 60 * 1000;
+                    break;
+                case 'days':
+                    extendMs = duration * 24 * 60 * 60 * 1000;
+                    break;
+            }
+            
+            selectedDevices.forEach(fingerprint => {
+                const deviceData = getDeviceData(fingerprint);
+                const newEndTime = Math.max(Date.now(), deviceData.restrictionEndTime) + extendMs;
+                
+                const newData = {
+                    attempts: deviceData.attempts,
+                    level: deviceData.restrictionLevel,
+                    endTime: newEndTime,
+                    deviceFingerprint: fingerprint,
+                    timestamp: deviceData.timestamp
+                };
+                
+                localStorage.setItem(`restriction_${fingerprint}`, JSON.stringify(newData));
+            });
+            
+            showMessage(`成功为 ${selectedDevices.size} 个设备延长限制时间${duration}${extendType === 'minutes' ? '分钟' : extendType === 'hours' ? '小时' : '天'}！`, 'success');
+            
+            closeModal('batchExtendDeviceModal');
+            selectedDevices.clear();
+            loadBannedDevices();
+        }
+        
+        function batchDeleteDeviceRestrictions() {
+            if (selectedDevices.size === 0) {
+                showMessage('请先选择要删除的设备！', 'error');
+                return;
+            }
+            
+            if (confirm(`确认删除选中的 ${selectedDevices.size} 个设备限制记录？`)) {
+                selectedDevices.forEach(fingerprint => {
+                    localStorage.removeItem(`restriction_${fingerprint}`);
+                });
+                
+                showMessage(`成功删除 ${selectedDevices.size} 个设备限制记录！`, 'success');
+                selectedDevices.clear();
+                loadBannedDevices();
+            }
+        }
+        
+        // 刷新封号设备列表
+        function refreshBannedDevices() {
+            loadBannedDevices();
+            showMessage('设备列表已刷新！', 'success');
+        }
+        
+        // 创建测试设备数据
+        function createTestDeviceData() {
+            const testDevices = [
+                {
+                    fingerprint: 'test001',
+                    attempts: 5,
+                    level: 1,
+                    endTime: Date.now() + 10 * 60 * 1000, // 10分钟后过期
+                    timestamp: Date.now() - 5 * 60 * 1000 // 5分钟前创建
+                },
+                {
+                    fingerprint: 'test002',
+                    attempts: 8,
+                    level: 2,
+                    endTime: Date.now() + 30 * 60 * 1000, // 30分钟后过期
+                    timestamp: Date.now() - 15 * 60 * 1000 // 15分钟前创建
+                },
+                {
+                    fingerprint: 'test003',
+                    attempts: 9,
+                    level: 3,
+                    endTime: 0, // 永久封禁
+                    timestamp: Date.now() - 60 * 60 * 1000 // 1小时前创建
+                },
+                {
+                    fingerprint: 'test004',
+                    attempts: 3,
+                    level: 0,
+                    endTime: 0,
+                    timestamp: Date.now() - 30 * 60 * 1000 // 30分钟前创建
+                }
+            ];
+            
+            // 保存测试数据到localStorage
+            testDevices.forEach(device => {
+                const data = {
+                    attempts: device.attempts,
+                    level: device.level,
+                    endTime: device.endTime,
+                    deviceFingerprint: device.fingerprint,
+                    timestamp: device.timestamp
+                };
+                
+                localStorage.setItem(`restriction_${device.fingerprint}`, JSON.stringify(data));
+            });
+            
+            showMessage('测试设备数据已创建！包含4个测试设备，不同限制状态。', 'success');
+            loadBannedDevices();
+        }
+
+        
+        // =========================== 公告管理功能 ===========================
+        
+        // 加载公告列表
+        function loadAnnouncements() {
+            let announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            
+            // 如果没有公告数据，创建一些示例数据
+            if (announcements.length === 0) {
+                createSampleAnnouncements();
+                announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            }
+            
+            const tbody = document.getElementById('announcementsTableBody');
+            
+            let html = '';
+            
+            // 按创建时间排序（最新的在前）
+            announcements.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            announcements.forEach(announcement => {
+                const checkboxCell = announcementBatchMode ? `<td><input type="checkbox" value="${announcement.id}" onchange="toggleAnnouncementSelection('${announcement.id}')"></td>` : '';
+                
+                const typeText = getAnnouncementTypeText(announcement.type);
+                const statusText = announcement.status === 'published' ? '已发布' : '草稿';
+                const statusClass = announcement.status === 'published' ? 'status-active' : 'status-unused';
+                
+                const createdTime = new Date(announcement.createdAt).toLocaleString();
+                const publishedTime = announcement.publishedAt ? new Date(announcement.publishedAt).toLocaleString() : '未发布';
+                
+                const priorityBadge = announcement.priority == 3 ? ' 🔴' : announcement.priority == 2 ? ' 🟡' : ' 🟢';
+                const stickyBadge = announcement.sticky ? ' 📌' : '';
+                
+                html += `
+                    <tr>
+                        ${checkboxCell}
+                        <td>
+                            <div>
+                                <strong onclick="viewAnnouncement('${announcement.id}')" style="cursor: pointer; color: #2196f3;">
+                                    ${announcement.title}${priorityBadge}${stickyBadge}
+                                </strong>
+                                <small style="display: block; color: #666; margin-top: 3px;">
+                                    ${announcement.content.substring(0, 50)}${announcement.content.length > 50 ? '...' : ''}
+                                </small>
+                            </div>
+                        </td>
+                        <td>${typeText}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${createdTime}</td>
+                        <td>${publishedTime}</td>
+                        <td>${announcement.views || 0}</td>
+                        <td>
+                            <button class="btn" onclick="editAnnouncement('${announcement.id}')" style="font-size: 12px; padding: 5px 8px;">编辑</button>
+                            ${announcement.status === 'draft' ? 
+                                `<button class="btn success" onclick="publishAnnouncement('${announcement.id}')" style="font-size: 12px; padding: 5px 8px;">发布</button>` :
+                                `<button class="btn warning" onclick="unpublishAnnouncement('${announcement.id}')" style="font-size: 12px; padding: 5px 8px;">撤回</button>`
+                            }
+                            <button class="btn danger" onclick="deleteAnnouncement('${announcement.id}')" style="font-size: 12px; padding: 5px 8px;">删除</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            const colspan = announcementBatchMode ? '8' : '7';
+            tbody.innerHTML = html || `<tr><td colspan="${colspan}" style="text-align: center;">暂无公告</td></tr>`;
+            updateSelectedAnnouncementCount();
+        }
+        
+        // 创建示例公告数据
+        function createSampleAnnouncements() {
+            const sampleAnnouncements = [
+                {
+                    id: 'ann_sample_001',
+                    title: '欢迎使用云成绩系统',
+                    type: 'info',
+                    status: 'published',
+                    content: '欢迎使用云成绩管理系统！本系统提供完善的成绩管理功能，包括成绩查询、数据导入、统计分析等。如有任何问题，请联系管理员。',
+                    priority: 2,
+                    duration: 30,
+                    sticky: true,
+                    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                    publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                    views: 145,
+                    author: 'admin'
+                },
+                {
+                    id: 'ann_sample_002',
+                    title: '系统维护通知',
+                    type: 'maintenance',
+                    status: 'published',
+                    content: '为了提供更好的服务，系统将于本周日晚上 22:00 - 24:00 进行维护升级。维护期间可能影响正常使用，请各位用户提前做好相关准备。维护完成后将第一时间通知大家。',
+                    priority: 3,
+                    duration: 7,
+                    sticky: false,
+                    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                    publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                    views: 89,
+                    author: 'admin'
+                },
+                {
+                    id: 'ann_sample_003',
+                    title: '新功能上线通知',
+                    type: 'update',
+                    status: 'published',
+                    content: '系统新增了多项实用功能：\n1. 成绩趋势分析图表\n2. 批量数据导入功能\n3. 成绩排名自动计算\n4. 移动端优化体验\n\n请各位用户及时体验新功能，如遇到问题请及时反馈。',
+                    priority: 2,
+                    duration: 14,
+                    sticky: false,
+                    createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+                    publishedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+                    views: 56,
+                    author: 'admin'
+                },
+                {
+                    id: 'ann_sample_004',
+                    title: '重要安全提醒',
+                    type: 'warning',
+                    status: 'draft',
+                    content: '为了保障账户安全，请所有用户注意以下事项：\n1. 定期修改密码，密码应包含字母、数字和特殊字符\n2. 不要在公共电脑上使用系统\n3. 登录后请及时退出\n4. 发现异常情况请立即联系管理员',
+                    priority: 3,
+                    duration: 15,
+                    sticky: false,
+                    createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+                    publishedAt: null,
+                    views: 0,
+                    author: 'admin'
+                }
+            ];
+            
+            localStorage.setItem('announcements', JSON.stringify(sampleAnnouncements));
+        }
+        
+        // 获取公告类型文本
+        function getAnnouncementTypeText(type) {
+            const types = {
+                'info': '信息通知',
+                'warning': '重要提醒',
+                'urgent': '紧急通知',
+                'maintenance': '系统维护',
+                'update': '版本更新'
+            };
+            return types[type] || '未知类型';
+        }
+        
+        // 显示添加公告模态框
+        function showAddAnnouncementModal() {
+            document.getElementById('addAnnouncementModal').style.display = 'block';
+        }
+        
+        // 生成公告 ID
+        function generateAnnouncementId() {
+            return 'ann_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // 添加公告表单提交
+        document.getElementById('addAnnouncementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('announcementTitle').value;
+            const type = document.getElementById('announcementType').value;
+            const status = document.getElementById('announcementStatus').value;
+            const content = document.getElementById('announcementContent').value;
+            const priority = parseInt(document.getElementById('announcementPriority').value);
+            const duration = parseInt(document.getElementById('announcementDuration').value);
+            const sticky = document.getElementById('announcementSticky').checked;
+            
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            
+            const newAnnouncement = {
+                id: generateAnnouncementId(),
+                title: title,
+                type: type,
+                status: status,
+                content: content,
+                priority: priority,
+                duration: duration,
+                sticky: sticky,
+                createdAt: new Date().toISOString(),
+                publishedAt: status === 'published' ? new Date().toISOString() : null,
+                views: 0,
+                author: 'admin'
+            };
+            
+            announcements.push(newAnnouncement);
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            const statusText = status === 'published' ? '发布' : '保存为草稿';
+            showMessage(`公告 ${statusText} 成功！`, 'success');
+            closeModal('addAnnouncementModal');
+            loadAnnouncements();
+            
+            // 清空表单
+            this.reset();
+        });
+        
+        // 编辑公告
+        function editAnnouncement(id) {
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const announcement = announcements.find(ann => ann.id === id);
+            
+            if (!announcement) {
+                showMessage('公告不存在！', 'error');
+                return;
+            }
+            
+            // 填充表单
+            document.getElementById('editAnnouncementId').value = announcement.id;
+            document.getElementById('editAnnouncementTitle').value = announcement.title;
+            document.getElementById('editAnnouncementType').value = announcement.type;
+            document.getElementById('editAnnouncementStatus').value = announcement.status;
+            document.getElementById('editAnnouncementContent').value = announcement.content;
+            document.getElementById('editAnnouncementPriority').value = announcement.priority;
+            document.getElementById('editAnnouncementDuration').value = announcement.duration;
+            document.getElementById('editAnnouncementSticky').checked = announcement.sticky;
+            
+            document.getElementById('editAnnouncementModal').style.display = 'block';
+        }
+        
+        // 编辑公告表单提交
+        document.getElementById('editAnnouncementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editAnnouncementId').value;
+            const title = document.getElementById('editAnnouncementTitle').value;
+            const type = document.getElementById('editAnnouncementType').value;
+            const status = document.getElementById('editAnnouncementStatus').value;
+            const content = document.getElementById('editAnnouncementContent').value;
+            const priority = parseInt(document.getElementById('editAnnouncementPriority').value);
+            const duration = parseInt(document.getElementById('editAnnouncementDuration').value);
+            const sticky = document.getElementById('editAnnouncementSticky').checked;
+            
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const announcementIndex = announcements.findIndex(ann => ann.id === id);
+            
+            if (announcementIndex === -1) {
+                showMessage('公告不存在！', 'error');
+                return;
+            }
+            
+            const oldStatus = announcements[announcementIndex].status;
+            
+            // 更新公告
+            announcements[announcementIndex] = {
+                ...announcements[announcementIndex],
+                title: title,
+                type: type,
+                status: status,
+                content: content,
+                priority: priority,
+                duration: duration,
+                sticky: sticky,
+                updatedAt: new Date().toISOString(),
+                publishedAt: (oldStatus === 'draft' && status === 'published') ? new Date().toISOString() : announcements[announcementIndex].publishedAt
+            };
+            
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            showMessage('公告修改成功！', 'success');
+            closeModal('editAnnouncementModal');
+            loadAnnouncements();
+        });
+        
+        // 查看公告详情
+        function viewAnnouncement(id) {
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const announcement = announcements.find(ann => ann.id === id);
+            
+            if (!announcement) {
+                showMessage('公告不存在！', 'error');
+                return;
+            }
+            
+            // 增加浏览次数
+            announcement.views = (announcement.views || 0) + 1;
+            const announcementIndex = announcements.findIndex(ann => ann.id === id);
+            announcements[announcementIndex] = announcement;
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            // 显示详情
+            document.getElementById('viewAnnouncementTitle').textContent = announcement.title;
+            
+            const typeText = getAnnouncementTypeText(announcement.type);
+            const statusText = announcement.status === 'published' ? '已发布' : '草稿';
+            const priorityText = announcement.priority == 3 ? '高' : announcement.priority == 2 ? '中' : '低';
+            const stickyText = announcement.sticky ? '是' : '否';
+            
+            document.getElementById('viewAnnouncementDetails').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <div><strong>类型：</strong> ${typeText}</div>
+                    <div><strong>状态：</strong> ${statusText}</div>
+                    <div><strong>优先级：</strong> ${priorityText}</div>
+                    <div><strong>置顶：</strong> ${stickyText}</div>
+                    <div><strong>浏览次数：</strong> ${announcement.views}</div>
+                    <div><strong>创建时间：</strong> ${new Date(announcement.createdAt).toLocaleString()}</div>
+                </div>
+            `;
+            
+            document.getElementById('viewAnnouncementContent').innerHTML = announcement.content.replace(/\n/g, '<br>');
+            
+            document.getElementById('viewAnnouncementModal').style.display = 'block';
+            
+            // 更新列表中的浏览次数
+            loadAnnouncements();
+        }
+        
+        // 发布公告
+        function publishAnnouncement(id) {
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const announcementIndex = announcements.findIndex(ann => ann.id === id);
+            
+            if (announcementIndex === -1) {
+                showMessage('公告不存在！', 'error');
+                return;
+            }
+            
+            announcements[announcementIndex].status = 'published';
+            announcements[announcementIndex].publishedAt = new Date().toISOString();
+            
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            // 发送实时通知
+            sendAnnouncementNotification(announcements[announcementIndex]);
+            
+            showMessage('公告发布成功！', 'success');
+            loadAnnouncements();
+        }
+        
+        // 撤回公告
+        function unpublishAnnouncement(id) {
+            if (!confirm('确认要撤回这个公告吗？撤回后用户将无法看到该公告。')) {
+                return;
+            }
+            
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const announcementIndex = announcements.findIndex(ann => ann.id === id);
+            
+            if (announcementIndex === -1) {
+                showMessage('公告不存在！', 'error');
+                return;
+            }
+            
+            announcements[announcementIndex].status = 'draft';
+            announcements[announcementIndex].publishedAt = null;
+            
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            showMessage('公告已撤回！', 'success');
+            loadAnnouncements();
+        }
+        
+        // 删除公告
+        function deleteAnnouncement(id) {
+            if (!confirm('确认要删除这个公告吗？此操作不可恢复！')) {
+                return;
+            }
+            
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const filteredAnnouncements = announcements.filter(ann => ann.id !== id);
+            
+            localStorage.setItem('announcements', JSON.stringify(filteredAnnouncements));
+            
+            showMessage('公告删除成功！', 'success');
+            loadAnnouncements();
+        }
+        
+        // 公告批量操作功能
+        function toggleAnnouncementBatchMode() {
+            announcementBatchMode = !announcementBatchMode;
+            const batchActions = document.getElementById('announcementBatchActions');
+            const checkboxHeader = document.getElementById('announcementCheckboxHeader');
+            const toggleBtn = document.getElementById('announcementBatchToggleBtn');
+            
+            if (announcementBatchMode) {
+                batchActions.style.display = 'block';
+                checkboxHeader.style.display = 'table-cell';
+                toggleBtn.textContent = '退出批量';
+                toggleBtn.classList.add('danger');
+            } else {
+                batchActions.style.display = 'none';
+                checkboxHeader.style.display = 'none';
+                toggleBtn.textContent = '批量操作';
+                toggleBtn.classList.remove('danger');
+                selectedAnnouncements.clear();
+            }
+            
+            loadAnnouncements();
+        }
+        
+        function toggleAnnouncementSelection(id) {
+            if (selectedAnnouncements.has(id)) {
+                selectedAnnouncements.delete(id);
+            } else {
+                selectedAnnouncements.add(id);
+            }
+            updateSelectedAnnouncementCount();
+        }
+        
+        function toggleAllAnnouncements() {
+            const checkboxes = document.querySelectorAll('#announcementsTableBody input[type="checkbox"]');
+            const selectAll = document.getElementById('selectAllAnnouncementCheckbox').checked;
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll;
+                if (selectAll) {
+                    selectedAnnouncements.add(checkbox.value);
+                } else {
+                    selectedAnnouncements.delete(checkbox.value);
+                }
+            });
+            
+            updateSelectedAnnouncementCount();
+        }
+        
+        function selectAllAnnouncements() {
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            selectedAnnouncements = new Set(announcements.map(ann => ann.id));
+            document.getElementById('selectAllAnnouncementCheckbox').checked = true;
+            document.querySelectorAll('#announcementsTableBody input[type="checkbox"]').forEach(cb => cb.checked = true);
+            updateSelectedAnnouncementCount();
+        }
+        
+        function deselectAllAnnouncements() {
+            selectedAnnouncements.clear();
+            document.getElementById('selectAllAnnouncementCheckbox').checked = false;
+            document.querySelectorAll('#announcementsTableBody input[type="checkbox"]').forEach(cb => cb.checked = false);
+            updateSelectedAnnouncementCount();
+        }
+        
+        function updateSelectedAnnouncementCount() {
+            const countElement = document.getElementById('selectedAnnouncementCount');
+            if (countElement) {
+                countElement.textContent = `已选中 ${selectedAnnouncements.size} 个公告`;
+            }
+        }
+        
+        function batchPublishAnnouncements() {
+            if (selectedAnnouncements.size === 0) {
+                showMessage('请先选择要发布的公告！', 'error');
+                return;
+            }
+            
+            document.getElementById('batchPublishCount').textContent = selectedAnnouncements.size;
+            document.getElementById('batchPublishAnnouncementModal').style.display = 'block';
+        }
+        
+        function confirmBatchPublishAnnouncements() {
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            let publishedCount = 0;
+            const publishedAnnouncements = [];
+            
+            selectedAnnouncements.forEach(id => {
+                const announcementIndex = announcements.findIndex(ann => ann.id === id);
+                if (announcementIndex !== -1 && announcements[announcementIndex].status === 'draft') {
+                    announcements[announcementIndex].status = 'published';
+                    announcements[announcementIndex].publishedAt = new Date().toISOString();
+                    publishedAnnouncements.push(announcements[announcementIndex]);
+                    publishedCount++;
+                }
+            });
+            
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            // 发送实时通知
+            if (publishedAnnouncements.length > 0) {
+                sendBatchAnnouncementNotification(publishedAnnouncements);
+            }
+            
+            showMessage(`成功发布 ${publishedCount} 个公告！`, 'success');
+            closeModal('batchPublishAnnouncementModal');
+            selectedAnnouncements.clear();
+            loadAnnouncements();
+        }
+        
+        function batchUnpublishAnnouncements() {
+            if (selectedAnnouncements.size === 0) {
+                showMessage('请先选择要撤回的公告！', 'error');
+                return;
+            }
+            
+            document.getElementById('batchUnpublishCount').textContent = selectedAnnouncements.size;
+            document.getElementById('batchUnpublishAnnouncementModal').style.display = 'block';
+        }
+        
+        function confirmBatchUnpublishAnnouncements() {
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            let unpublishedCount = 0;
+            
+            selectedAnnouncements.forEach(id => {
+                const announcementIndex = announcements.findIndex(ann => ann.id === id);
+                if (announcementIndex !== -1 && announcements[announcementIndex].status === 'published') {
+                    announcements[announcementIndex].status = 'draft';
+                    announcements[announcementIndex].publishedAt = null;
+                    unpublishedCount++;
+                }
+            });
+            
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            showMessage(`成功撤回 ${unpublishedCount} 个公告！`, 'success');
+            closeModal('batchUnpublishAnnouncementModal');
+            selectedAnnouncements.clear();
+            loadAnnouncements();
+        }
+        
+        function batchDeleteAnnouncements() {
+            if (selectedAnnouncements.size === 0) {
+                showMessage('请先选择要删除的公告！', 'error');
+                return;
+            }
+            
+            if (!confirm(`确认要删除选中的 ${selectedAnnouncements.size} 个公告吗？此操作不可恢复！`)) {
+                return;
+            }
+            
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const filteredAnnouncements = announcements.filter(ann => !selectedAnnouncements.has(ann.id));
+            
+            localStorage.setItem('announcements', JSON.stringify(filteredAnnouncements));
+            
+            showMessage(`成功删除 ${selectedAnnouncements.size} 个公告！`, 'success');
+            selectedAnnouncements.clear();
+            loadAnnouncements();
+        }
+        
+        // =========================== 公告管理功能结束 ===========================
+        
+        // =========================== 实时通知功能 ===========================
+        
+        // 发送单个公告通知
+        function sendAnnouncementNotification(announcement) {
+            // 保存通知到localStorage，供其他页面读取
+            const notifications = JSON.parse(localStorage.getItem('realtimeNotifications') || '[]');
+            
+            const notification = {
+                id: 'notif_' + Date.now(),
+                type: 'announcement',
+                title: '新公告发布',
+                message: `【${getAnnouncementTypeText(announcement.type)}】${announcement.title}`,
+                data: announcement,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+            
+            notifications.unshift(notification);
+            // 保留最近的10条通知
+            if (notifications.length > 10) {
+                notifications.splice(10);
+            }
+            
+            localStorage.setItem('realtimeNotifications', JSON.stringify(notifications));
+            
+            // 触发自定义事件，通知其他页面
+            window.dispatchEvent(new CustomEvent('realtimeNotification', {
+                detail: notification
+            }));
+        }
+        
+        // 发送批量公告通知
+        function sendBatchAnnouncementNotification(announcements) {
+            // 保存通知到localStorage，供其他页面读取
+            const notifications = JSON.parse(localStorage.getItem('realtimeNotifications') || '[]');
+            
+            const notification = {
+                id: 'notif_' + Date.now(),
+                type: 'batch_announcement',
+                title: '批量公告发布',
+                message: `发布了 ${announcements.length} 条新公告`,
+                data: announcements,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+            
+            notifications.unshift(notification);
+            // 保留最近的10条通知
+            if (notifications.length > 10) {
+                notifications.splice(10);
+            }
+            
+            localStorage.setItem('realtimeNotifications', JSON.stringify(notifications));
+            
+            // 触发自定义事件，通知其他页面
+            window.dispatchEvent(new CustomEvent('realtimeNotification', {
+                detail: notification
+            }));
+        }
+        
+        // =========================== 实时通知功能结束 ===========================
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            
+            // 如果正在显示其他消息，先隐藏
+            if (messageDiv.style.display === 'block') {
+                messageDiv.style.animation = 'messageSlideOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    showNewMessage(text, type);
+                }, 300);
+            } else {
+                showNewMessage(text, type);
+            }
+        }
+        
+        function showNewMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            messageDiv.style.animation = 'messageSlideIn 0.5s ease-out forwards';
+            
+            // 添加光效动画
+            setTimeout(() => {
+                messageDiv.classList.add('show');
+            }, 100);
+            
+            // 自动隐藏（成功消息3秒，错误消息4秒）
+            const hideDelay = type === 'error' ? 4000 : 3000;
+            setTimeout(() => {
+                hideMessage();
+            }, hideDelay);
+        }
+        
+        function hideMessage() {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.animation = 'messageSlideOut 0.4s ease-out forwards';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+                messageDiv.classList.remove('show');
+            }, 400);
+        }
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        };
+    </script>
+</body>
+</html>
